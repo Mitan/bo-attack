@@ -4,7 +4,7 @@ import numpy as np
 from pyDOE import lhs
 from scipy.optimize import fmin_l_bfgs_b
 
-from utilities.upsampler import downsample_projection
+from src.utilities.upsampler import downsample_projection
 
 
 def get_init_data(obj_func, n_init, bounds, method='lhs'):

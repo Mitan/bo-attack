@@ -4,7 +4,7 @@
 import GPy
 import numpy as np
 
-from utilities.utilities import subset_select
+from src.utilities.utilities import subset_select
 from .base import BaseModel
 
 

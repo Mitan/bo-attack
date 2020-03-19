@@ -3,8 +3,8 @@
 import GPy
 import numpy as np
 
-from utilities.upsampler import downsample_projection
-from utilities.utilities import subset_select, subset_select_for_learning
+from src.utilities.upsampler import downsample_projection
+from src.utilities.utilities import subset_select, subset_select_for_learning
 from .base import BaseModel
 
 

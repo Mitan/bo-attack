@@ -2,7 +2,7 @@
 Modified by Dmitrii from the original code by Robin Ru
 """
 
-from utilities.utilities import optimise_acqu_func, optimise_acqu_func_for_NN, optimise_acqu_func_additive, \
+from src.utilities.utilities import optimise_acqu_func, optimise_acqu_func_for_NN, optimise_acqu_func_additive, \
     optimise_acqu_func_mledr
 
 

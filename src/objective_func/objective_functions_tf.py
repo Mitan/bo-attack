@@ -6,10 +6,10 @@ import os
 
 import numpy as np
 
-import objective_func.tf_models.Utils as util
-from objective_func.tf_models.setup_cifar import CIFAR, CIFARModel
-from objective_func.tf_models.setup_mnist import MNIST, MNISTModel
-from utilities.upsampler import upsample_projection
+import src.objective_func.tf_models.Utils as util
+from src.objective_func.tf_models.setup_cifar import CIFAR, CIFARModel
+from src.objective_func.tf_models.setup_mnist import MNIST, MNISTModel
+from src.utilities.upsampler import upsample_projection
 
 
 class CNN(object):

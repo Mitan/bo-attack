@@ -6,10 +6,10 @@ import pickle
 
 import numpy as np
 
-from bayesopt import Bayes_opt
-from objective_func.objective_functions_tf import CNN
-from utilities.upsampler import upsample_projection
-from utilities.utilities import get_init_data
+from src.bayesopt import Bayes_opt
+from src.objective_func.objective_functions_tf import CNN
+from src.utilities.upsampler import upsample_projection
+from src.utilities.utilities import get_init_data
 
 
 def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,

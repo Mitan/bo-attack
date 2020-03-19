@@ -5,12 +5,11 @@ import time
 
 import numpy as np
 
-from acq_funcs.acqoptimizer import AcqOptimizer
-from acq_funcs.acquisitions import LCB_budget, LCB_budget_additive
-from models.additive_gp_decomp import Additive_GPModel_Learn_Decomp
-from models.gp import GPModel
-from models.gpdr import GPModelLDR
-from utilities.upsampler import upsample_projection
+from src.acq_funcs.acqoptimizer import AcqOptimizer
+from src.acq_funcs.acquisitions import LCB_budget, LCB_budget_additive
+from src.models.additive_gp_decomp import Additive_GPModel_Learn_Decomp
+from src.models.gpdr import GPModelLDR
+from src.utilities.upsampler import upsample_projection
 
 
 class Bayes_opt():
