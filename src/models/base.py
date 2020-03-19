@@ -1,5 +1,6 @@
 from abc import abstractmethod
 
+
 class BaseModel:
 
     @abstractmethod
@@ -21,7 +22,7 @@ class BaseModel:
         return
 
     @abstractmethod
-    def predict_withGradients(self, X):
+    def predict_with_gradients(self, X):
         """
         Returns the mean, standard deviation, mean gradient and standard deviation gradient at X.
         """

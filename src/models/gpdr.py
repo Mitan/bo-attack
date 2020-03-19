@@ -164,7 +164,7 @@ class GPModelLDR(BaseModel):
 
         return m, np.sqrt(v)
 
-    def predict_withGradients(self, X):
+    def predict_with_gradients(self, X):
         """
         :param X: test location
         :return m: predictive posterior mean

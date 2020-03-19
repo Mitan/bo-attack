@@ -46,7 +46,7 @@ class EI(object):
         """
 
         fmin = self.model.get_fmin()
-        m, s, dmdx, dsdx = self.model.predict_withGradients(x)
+        m, s, dmdx, dsdx = self.model.predict_with_gradients(x)
         phi, Phi, u = get_quantiles(self.jitter, fmin, m, s)
         f_acqu = s * (u * Phi + phi)
         df_acqu = dsdx * phi - Phi * dmdx
@@ -83,7 +83,7 @@ class LCB(object):
         :return df_acqu: derivative of acqusition function values w.r.t test location
         """
 
-        m, s, dmdx, dsdx = self.model.predict_withGradients(x)
+        m, s, dmdx, dsdx = self.model.predict_with_gradients(x)
         f_acqu = -m + self.beta * s
         df_acqu = -dmdx + self.beta * dsdx
         return f_acqu, df_acqu
@@ -126,7 +126,7 @@ class LCB_budget(object):
         :return df_acqu: derivative of acqusition function values w.r.t test location
         """
 
-        m, s, dmdx, dsdx = self.model.predict_withGradients(x)
+        m, s, dmdx, dsdx = self.model.predict_with_gradients(x)
         f_acqu = -m + self.beta * s
         df_acqu = -dmdx + self.beta * dsdx
 
