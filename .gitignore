@@ -168,3 +168,4 @@ mnist
 *.gz
 src/exp_results
 README.md
+tests

@@ -37,7 +37,8 @@ def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
         x_bounds = np.vstack([[-1, 1]] * low_dim * nchannel)
 
     # Specify the experiment results saving directory
-    results_data_folder = f'{directory}exp_results/{obj_func}_tf_{model_type}_ob{obj_metric}_' \
+
+    results_data_folder = f'../tests/exp_results/{obj_func}_tf_{model_type}_ob{obj_metric}_' \
                           f'_freq{update_freq}_ld{low_dim}_{dim_reduction}/'
     if not os.path.exists(results_data_folder):
         os.makedirs(results_data_folder)
@@ -177,7 +178,7 @@ if __name__ == '__main__':
     parser.add_argument('-init', '--n_init', help='Initial number of observation.',
                         default=30, type=int)
     parser.add_argument('-nitr', '--max_itr', help='Max BO iterations.',
-                        default=10, type=int)
+                        default=900, type=int)
     parser.add_argument('-rd', '--reduction', help='Use which dimension reduction technique. '
                                                    'BILI, BICU, NN, CLUSTER, None.',
                         default='BILI', type=str)
