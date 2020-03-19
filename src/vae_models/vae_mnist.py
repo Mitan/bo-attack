@@ -91,7 +91,7 @@ def plot_results(models,
 
 class MnistVariationalAutoEncoder(object):
 
-    def __init__(self, latent_dim, original_dim=784, intermediate_dim=200):
+    def __init__(self, latent_dim, original_dim=784, intermediate_dim=512):
         self.latent_dim = latent_dim
         self.intermediate_dim = intermediate_dim
         self.original_dim = original_dim
