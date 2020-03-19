@@ -159,3 +159,12 @@ fabric.properties
 .idea/httpRequests
 
 .idea
+*.png
+vae_mlp_mnist.h5
+src/objective_func/tf_models/mnist_data
+src/objective_func/tf_models/cifar-10-batches-bin
+cifar
+mnist
+*.gz
+src/exp_results
+README.md
