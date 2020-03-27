@@ -6,6 +6,7 @@ import pickle
 
 import numpy as np
 
+from enums.AcquisitionEnum import AcquisitionEnum
 from enums.GPEnum import GPEnum
 from src.bayesopt import Bayes_opt
 from src.objective_func.objective_functions_tf import CNN
@@ -100,7 +101,7 @@ def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
 
             # Initialise BO
             bayes_opt = Bayes_opt(func=f, bounds=x_bounds, saving_path=failed_file_name)
-            bayes_opt.initialise(X_init=x_init, Y_init=y_init, model_type=model_type, acq_type=acq_type,
+            bayes_opt.initialise(X_init=x_init, Y_init=y_init, gp_type=model_type, acq_type=acq_type,
                                  sparse=sparse, nsubspaces=nsubspaces, update_freq=update_freq,
                                  nchannel=nchannel, high_dim=high_dim, dim_reduction=dim_reduction,
                                  seed=seed)
@@ -154,7 +155,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--model', help='Surrogate model: GP or ADDGPLD or ADDGPFD or GPLDR',
                         default=GPEnum.LearnDimGP, type=int)
     parser.add_argument('-acq', '--acq_func', help='Acquisition function type: LCB, EI',
-                        default='LCB', type=str)
+                        default=AcquisitionEnum.LCB, type=int)
 
     parser.add_argument('-ld', '--low_dim', help='Dimension of reduced subspace.',
                         default=196, type=int)

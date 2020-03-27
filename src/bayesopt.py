@@ -5,10 +5,10 @@ import time
 
 import numpy as np
 
+from acq_funcs.acq_function_factory import AcquisitionFunctionFactory
+from enums.AcquisitionEnum import AcquisitionEnum
 from enums.GPEnum import GPEnum
 from gp.gp_factory import GaussianProcessFactory
-from src.acq_funcs.acquisition_optimizer import AcqOptimizer
-from src.acq_funcs.acquisitions import LCB_budget, LCB_budget_additive
 from src.utilities.upsampler import upsample_projection
 
 
@@ -27,17 +27,17 @@ class Bayes_opt():
         self.noise_var = 1.0e-10
         self.saving_path = saving_path
         self.gp_factory = GaussianProcessFactory()
+        self.acq_factory = AcquisitionFunctionFactory()
 
-    def initialise(self, X_init=None, Y_init=None, model_type=GPEnum.SimpleGP,
-                   acq_type='LCB', batch_option='CL', sparse=None, seed=42, nchannel=3,
+    def initialise(self, X_init=None, Y_init=None, gp_type=GPEnum.SimpleGP,
+                   acq_type=AcquisitionEnum.LCB, sparse=None, seed=42, nchannel=3,
                    high_dim=int(32 * 32),
                    ARD=False, nsubspaces=1, normalize_Y=True, update_freq=10, dim_reduction='BILI'):
         """
         :param X_init: initial observation input data
         :param Y_init: initial observation input data
-        :param model_type: BO surrogate model type
+        :param gp_type: BO surrogate model type
         :param acq_type: BO acquisition function type
-        :param batch_option: for selecting a batch of new locations to be evaluated in parallel next
         :param batch_size: the number of new query locations in the batch (=1 for sequential BO and > 1 for parallel BO)
         :param sparse: sparse GP options
         :param seed: random seed
@@ -58,10 +58,8 @@ class Bayes_opt():
         self.X = np.copy(X_init)
         self.Y = np.copy(Y_init)
         self.acq_type = acq_type
-        self.batch_option = batch_option
-        self.model_type = model_type
+        self.gp_type = gp_type
         self.seed = seed
-        self.normalize_Y = normalize_Y
         self.nchannel = nchannel
         self.X_dim = self.X.shape[1]
         self.high_dim = high_dim
@@ -71,7 +69,7 @@ class Bayes_opt():
         self.arg_opt = np.atleast_2d(self.X[np.argmin(self.Y)])
         self.minY = np.min(self.Y)
 
-        self.gp_model = self.gp_factory.get_gp(gp_type=model_type,
+        self.gp_model = self.gp_factory.get_gp(gp_type=gp_type,
                                                noise_var=self.noise_var,
                                                ARD=ARD,
                                                seed=seed,
@@ -83,17 +81,11 @@ class Bayes_opt():
                                                nchannel=nchannel,
                                                nsubspaces=nsubspaces)
 
-        # Choose the acquisition function for BO
-        if self.acq_type == 'LCB':
-            if model_type == GPEnum.AdditiveGP:
-                acqu_func = LCB_budget_additive(self.gp_model)
-            else:
-                acqu_func = LCB_budget(self.gp_model)
-        else:
-            print('Not implemented')
-        self.acq_optimizer = AcqOptimizer(model=self.gp_model, acqu_func=acqu_func, bounds=self.bounds,
-                                          model_name=model_type,
-                                          nsubspace=nsubspaces)
+        self.acq_optimizer = self.acq_factory.get_acq_optimizer(acq_type=acq_type,
+                                                                gp_model=self.gp_model,
+                                                                gp_type=gp_type,
+                                                                bounds=self.bounds,
+                                                                nsubspaces=nsubspaces)
 
     def run(self, total_iterations):
         """
@@ -117,7 +109,7 @@ class Bayes_opt():
         self.opt_dr_list = []
 
         # Upsample the observed data to image dimension in the case of auto-learning of d^r
-        if self.model_type == GPEnum.LearnDimGP:
+        if self.gp_type == GPEnum.LearnDimGP:
             x_curr_dim = self.X.shape[1]
             if int(x_curr_dim / self.nchannel) < self.high_dim:
                 self.X = upsample_projection(self.dim_reduction, X_query, low_dim=int(x_curr_dim / self.nchannel),
@@ -136,7 +128,7 @@ class Bayes_opt():
             time_record[k, 0] = t_opt_acq
 
             # Upsample the observed data to image dimension in the case of auto-learning of d^r after each iteration
-            if self.model_type == GPEnum.LearnDimGP:
+            if self.gp_type == GPEnum.LearnDimGP:
                 self.opt_dr_list.append(self.gp_model.opt_dr)
                 x_curr_dim = x_next_batch.shape[1]
                 if int(x_curr_dim / self.nchannel) < self.high_dim:
@@ -160,7 +152,7 @@ class Bayes_opt():
             X_opt = np.concatenate((X_opt, np.atleast_2d(X_query[np.argmin(Y_query), :])))
             Y_opt = np.concatenate((Y_opt, np.atleast_2d(min(Y_query))))
 
-            print(f'{self.model_type}{self.acq_type}{self.batch_option} ||'
+            print(f'{self.gp_type}{self.acq_type} ||'
                   f'seed:{self.seed},itr:{k}, y_next:{np.min(y_next_batch)}, y_opt:{Y_opt[-1, :]}')
 
             # Terminate the BO loop if the attack succeeds
