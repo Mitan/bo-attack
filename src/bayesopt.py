@@ -5,10 +5,10 @@ import time
 
 import numpy as np
 
+from enum.GPEnum import GPEnum
+from gp.gp_factory import GaussianProcessFactory
 from src.acq_funcs.acquisition_optimizer import AcqOptimizer
 from src.acq_funcs.acquisitions import LCB_budget, LCB_budget_additive
-from src.models.additive_gp_decomp import Additive_GPModel_Learn_Decomp
-from src.models.gpdr import GPModelLDR
 from src.utilities.upsampler import upsample_projection
 
 
@@ -26,8 +26,9 @@ class Bayes_opt():
         self.bounds = bounds
         self.noise_var = 1.0e-10
         self.saving_path = saving_path
+        self.gp_factory = GaussianProcessFactory()
 
-    def initialise(self, X_init=None, Y_init=None, model_type='GP',
+    def initialise(self, X_init=None, Y_init=None, model_type=GPEnum.SimpleGP,
                    acq_type='LCB', batch_option='CL', sparse=None, seed=42, nchannel=3,
                    high_dim=int(32 * 32),
                    ARD=False, nsubspaces=1, normalize_Y=True, update_freq=10, dim_reduction='BILI'):
@@ -70,38 +71,27 @@ class Bayes_opt():
         self.arg_opt = np.atleast_2d(self.X[np.argmin(self.Y)])
         self.minY = np.min(self.Y)
 
-        if model_type == 'GPLDR':
-            nsubspaces = 1
-            if self.noise_var > 1e-6:
-                self.model = GPModelLDR(noise_var=self.noise_var, ARD=ARD, seed=seed, high_dim=high_dim,
-                                        dim_reduction=dim_reduction, sparse=sparse,
-                                        normalize_Y=self.normalize_Y, update_freq=update_freq, nchannel=nchannel)
-            else:
-                self.model = GPModelLDR(exact_feval=True, ARD=ARD, seed=seed, high_dim=high_dim,
-                                        dim_reduction=dim_reduction, sparse=sparse,
-                                        normalize_Y=self.normalize_Y, update_freq=update_freq, nchannel=nchannel)
-
-        elif model_type == 'ADDGPLD':
-            print(f'nsubspaces={nsubspaces}')
-            if self.noise_var > 1e-6:
-                self.model = Additive_GPModel_Learn_Decomp(noise_var=self.noise_var, ARD=ARD,
-                                                           sparse=sparse,
-                                                           seed=seed, normalize_Y=self.normalize_Y,
-                                                           n_subspaces=nsubspaces, update_freq=update_freq)
-            else:
-                self.model = Additive_GPModel_Learn_Decomp(exact_feval=True, ARD=ARD, sparse=sparse,
-                                                           seed=seed, normalize_Y=self.normalize_Y,
-                                                           n_subspaces=nsubspaces, update_freq=update_freq)
+        self.gp_model = self.gp_factory.get_gp(gp_type=model_type,
+                                               noise_var=self.noise_var,
+                                               ARD=ARD,
+                                               seed=seed,
+                                               high_dim=high_dim,
+                                               dim_reduction=dim_reduction,
+                                               sparse=sparse,
+                                               normalize_Y=normalize_Y,
+                                               update_freq=update_freq,
+                                               nchannel=nchannel,
+                                               nsubspaces=nsubspaces)
 
         # Choose the acquisition function for BO
         if self.acq_type == 'LCB':
             if model_type.startswith('ADDGP'):
-                acqu_func = LCB_budget_additive(self.model)
+                acqu_func = LCB_budget_additive(self.gp_model)
             else:
-                acqu_func = LCB_budget(self.model)
+                acqu_func = LCB_budget(self.gp_model)
         else:
             print('Not implemented')
-        self.acq_optimizer = AcqOptimizer(model=self.model, acqu_func=acqu_func, bounds=self.bounds,
+        self.acq_optimizer = AcqOptimizer(model=self.gp_model, acqu_func=acqu_func, bounds=self.bounds,
                                           model_name=model_type,
                                           nsubspace=nsubspaces)
 
@@ -134,7 +124,7 @@ class Bayes_opt():
                                              high_dim=self.high_dim, nchannel=self.nchannel)
 
         # Fit GP model to the observed data
-        self.model._update_model(self.X, self.Y, itr=0)
+        self.gp_model._update_model(self.X, self.Y, itr=0)
 
         for k in range(total_iterations):
 
@@ -147,7 +137,7 @@ class Bayes_opt():
 
             # Upsample the observed data to image dimension in the case of auto-learning of d^r after each iteration
             if 'LDR' in self.model_type:
-                self.opt_dr_list.append(self.model.opt_dr)
+                self.opt_dr_list.append(self.gp_model.opt_dr)
                 x_curr_dim = x_next_batch.shape[1]
                 if int(x_curr_dim / self.nchannel) < self.high_dim:
                     x_next_batch = upsample_projection(self.dim_reduction, x_next_batch,
@@ -180,12 +170,12 @@ class Bayes_opt():
             # Update the surrogate model with new data
             start_time_update = time.time()
             try:
-                self.model._update_model(self.X, self.Y, itr=k)
+                self.gp_model._update_model(self.X, self.Y, itr=k)
             except:
                 # If the model update fails, terminate the BO loop
                 partial_results = {'X_query': self.X.astype(np.float16),
                                    'Y_query': self.Y.astype(np.float16),
-                                   'model_kernel': self.model.model.kern}
+                                   'model_kernel': self.gp_model.model.kern}
                 failed_file_name = self.saving_path
                 with open(failed_file_name, 'wb') as file:
                     pickle.dump(partial_results, file)
