@@ -1,4 +1,4 @@
-from enum.GPEnum import GPEnum
+from enums.GPEnum import GPEnum
 from gp.additive_gp_decomp import Additive_GPModel_Learn_Decomp
 from gp.gpdr import GPModelLDR
 
@@ -31,5 +31,6 @@ class GaussianProcessFactory:
                 gp = Additive_GPModel_Learn_Decomp(exact_feval=True, ARD=ARD, sparse=sparse,
                                                    seed=seed, normalize_Y=normalize_Y,
                                                    n_subspaces=nsubspaces, update_freq=update_freq)
-
+        else:
+            raise NotImplementedError
         return gp

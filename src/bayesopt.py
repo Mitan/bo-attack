@@ -5,7 +5,7 @@ import time
 
 import numpy as np
 
-from enum.GPEnum import GPEnum
+from enums.GPEnum import GPEnum
 from gp.gp_factory import GaussianProcessFactory
 from src.acq_funcs.acquisition_optimizer import AcqOptimizer
 from src.acq_funcs.acquisitions import LCB_budget, LCB_budget_additive
@@ -85,7 +85,7 @@ class Bayes_opt():
 
         # Choose the acquisition function for BO
         if self.acq_type == 'LCB':
-            if model_type.startswith('ADDGP'):
+            if model_type == GPEnum.AdditiveGP:
                 acqu_func = LCB_budget_additive(self.gp_model)
             else:
                 acqu_func = LCB_budget(self.gp_model)
@@ -117,7 +117,7 @@ class Bayes_opt():
         self.opt_dr_list = []
 
         # Upsample the observed data to image dimension in the case of auto-learning of d^r
-        if 'LDR' in self.model_type:
+        if self.model_type == GPEnum.LearnDimGP:
             x_curr_dim = self.X.shape[1]
             if int(x_curr_dim / self.nchannel) < self.high_dim:
                 self.X = upsample_projection(self.dim_reduction, X_query, low_dim=int(x_curr_dim / self.nchannel),
@@ -136,7 +136,7 @@ class Bayes_opt():
             time_record[k, 0] = t_opt_acq
 
             # Upsample the observed data to image dimension in the case of auto-learning of d^r after each iteration
-            if 'LDR' in self.model_type:
+            if self.model_type == GPEnum.LearnDimGP:
                 self.opt_dr_list.append(self.gp_model.opt_dr)
                 x_curr_dim = x_next_batch.shape[1]
                 if int(x_curr_dim / self.nchannel) < self.high_dim:

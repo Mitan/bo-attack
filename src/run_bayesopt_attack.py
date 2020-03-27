@@ -6,6 +6,7 @@ import pickle
 
 import numpy as np
 
+from enums.GPEnum import GPEnum
 from src.bayesopt import Bayes_opt
 from src.objective_func.objective_functions_tf import CNN
 from src.utilities.upsampler import upsample_projection
@@ -28,7 +29,7 @@ def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
         nchannel = 3
         epsilon = 0.05
 
-    if 'LDR' in model_type:
+    if model_type == GPEnum.LearnDimGP:
         low_dim = high_dim
 
     x_bounds = np.vstack([[-1, 1]] * low_dim * nchannel)
@@ -60,8 +61,8 @@ def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
         target_label = cnn.target_label[0]
         print(f'id={img_offset}, origin={input_label}, target={target_label}, eps={epsilon}, dr={low_dim}')
 
-        if 'LDR' in model_type:
-                f = lambda x: cnn.np_evaluate(x)
+        if model_type == GPEnum.LearnDimGP:
+            f = lambda x: cnn.np_evaluate(x)
         else:
             f = lambda x: cnn.np_upsample_evaluate(x)
 
@@ -108,7 +109,7 @@ def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
             X_query_full, Y_query, X_opt_full, Y_opt, time_record = bayes_opt.run(total_iterations=num_iter)
 
             # Reduce the memory needed for storing results
-            if 'LDR' in model_type:
+            if model_type==GPEnum.LearnDimGP:
                 X_query = X_query_full[-2:]
                 X_opt = X_opt_full[-2:]
             else:
@@ -151,7 +152,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--func', help='Objective function(datasets): mnist, cifar10',
                         default='mnist', type=str)
     parser.add_argument('-m', '--model', help='Surrogate model: GP or ADDGPLD or ADDGPFD or GPLDR',
-                        default='GPLDR', type=str)
+                        default=GPEnum.LearnDimGP, type=int)
     parser.add_argument('-acq', '--acq_func', help='Acquisition function type: LCB, EI',
                         default='LCB', type=str)
 

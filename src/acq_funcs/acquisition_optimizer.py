@@ -1,14 +1,14 @@
 """
 Modified by Dmitrii from the original code by Robin Ru
 """
-
+from enums.GPEnum import GPEnum
 from src.utilities.utilities import optimise_acqu_func, optimise_acqu_func_for_NN, optimise_acqu_func_additive, \
     optimise_acqu_func_mledr
 
 
 class AcqOptimizer(object):
 
-    def __init__(self, model, acqu_func, bounds, model_name='GP', nsubspace=1):
+    def __init__(self, model, acqu_func, bounds, model_name=GPEnum.SimpleGP, nsubspace=1):
         """
         Optimise the acquisition functions to recommend the next (batch) locations for evaluation
 
@@ -31,12 +31,12 @@ class AcqOptimizer(object):
         :return acq_value: acqusitioin function value of the input recommended
         """
 
-        if self.model_name == 'GP':
+        if self.model_name == GPEnum.SimpleGP:
             new_x, acq_value = optimise_acqu_func(acqu_func=self.acqu_func, bounds=self.bounds, X_ob=X)
-        elif self.model_name == 'GPLDR':
+        elif self.model_name == GPEnum.LearnDimGP:
             new_x, acq_value = optimise_acqu_func_mledr(acqu_func=self.acqu_func, bounds=self.bounds,
                                                         X_ob=X)
-        elif self.model_name.startswith('ADDGP'):
+        elif self.model_name == GPEnum.AdditiveGP:
             new_x, acq_value = optimise_acqu_func_additive(acqu_func=self.acqu_func, bounds=self.bounds,
                                                            X_ob=X, nsubspace=self.nsubspace)
         else:
