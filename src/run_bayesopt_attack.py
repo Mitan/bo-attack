@@ -14,7 +14,7 @@ from src.utilities.utilities import get_init_data
 
 def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
                     img_offset, n_init=50, num_iter=40, ntargets=9, target_label=0, dim_reduction='BILI',
-                    cost_metric=None, obj_metric=1, update_freq=10, nsubspaces=1):
+                    obj_metric=1, update_freq=10, nsubspaces=1):
     # Specify code directory
     directory = './'
 
@@ -31,10 +31,7 @@ def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
     if 'LDR' in model_type:
         low_dim = high_dim
 
-    if dim_reduction == 'NONE':
-        x_bounds = np.vstack([[-1, 1]] * high_dim * nchannel)
-    else:
-        x_bounds = np.vstack([[-1, 1]] * low_dim * nchannel)
+    x_bounds = np.vstack([[-1, 1]] * low_dim * nchannel)
 
     # Specify the experiment results saving directory
 
@@ -63,17 +60,10 @@ def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
         target_label = cnn.target_label[0]
         print(f'id={img_offset}, origin={input_label}, target={target_label}, eps={epsilon}, dr={low_dim}')
 
-        # Define the BO objective function
-        if obj_func == 'imagenet':
-            if 'LDR' in model_type or dim_reduction == 'NONE':
-                f = lambda x: cnn.np_evaluate_bili(x)
-            else:
-                f = lambda x: cnn.np_upsample_evaluate_bili(x)
-        else:
-            if 'LDR' in model_type or dim_reduction == 'NONE':
+        if 'LDR' in model_type:
                 f = lambda x: cnn.np_evaluate(x)
-            else:
-                f = lambda x: cnn.np_upsample_evaluate(x)
+        else:
+            f = lambda x: cnn.np_upsample_evaluate(x)
 
         # Define the name of results file and failure fail(for debug or resume)
         results_file_name = os.path.join(results_data_folder,
@@ -112,7 +102,7 @@ def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
             bayes_opt.initialise(X_init=x_init, Y_init=y_init, model_type=model_type, acq_type=acq_type,
                                  sparse=sparse, nsubspaces=nsubspaces, update_freq=update_freq,
                                  nchannel=nchannel, high_dim=high_dim, dim_reduction=dim_reduction,
-                                 cost_metric=cost_metric, seed=seed)
+                                 seed=seed)
 
             # Run BO
             X_query_full, Y_query, X_opt_full, Y_opt, time_record = bayes_opt.run(total_iterations=num_iter)
@@ -130,25 +120,17 @@ def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
             Y_query_all_slices.append(Y_query)
             opt_dr_list = bayes_opt.opt_dr_list
 
-            if dim_reduction == 'NONE':
-                X_reduced_opt_all_slices.append(X_opt.astype(np.float16))
-                X_reduced_query_all_slices.append(X_query.astype(np.float16))
-                X_query_all_slices.append(X_query)
-                X_opt_all_slices.append(X_opt)
-                print(f'Y_opt={Y_opt[-1]}, X_opt shape{X_opt.shape}, X_h_opt shape{X_opt.shape}, '
-                      f'X_query shape{X_query.shape}, X_h_query shape{X_query.shape}, opt_dr={opt_dr_list[-1]}')
-            else:
-                X_reduced_opt_all_slices.append(X_opt.astype(np.float16))
-                X_reduced_query_all_slices.append(X_query.astype(np.float16))
+            X_reduced_opt_all_slices.append(X_opt.astype(np.float16))
+            X_reduced_query_all_slices.append(X_query.astype(np.float16))
 
-                # Transform data from reduced search space to original high-dimensional input space
-                X_h_query = upsample_projection(dim_reduction, X_query, low_dim=low_dim, high_dim=high_dim,
+            # Transform data from reduced search space to original high-dimensional input space
+            X_h_query = upsample_projection(dim_reduction, X_query, low_dim=low_dim, high_dim=high_dim,
                                                 nchannel=nchannel)
-                X_query_all_slices.append(X_h_query)
-                X_h_opt = upsample_projection(dim_reduction, X_opt, low_dim=low_dim, high_dim=high_dim,
+            X_query_all_slices.append(X_h_query)
+            X_h_opt = upsample_projection(dim_reduction, X_opt, low_dim=low_dim, high_dim=high_dim,
                                               nchannel=nchannel)
-                X_opt_all_slices.append(X_h_opt)
-                print(f'Y_opt={Y_opt[-1]}, X_opt shape{X_opt.shape}, X_h_opt shape{X_h_opt.shape}, '
+            X_opt_all_slices.append(X_h_opt)
+            print(f'Y_opt={Y_opt[-1]}, X_opt shape{X_opt.shape}, X_h_opt shape{X_h_opt.shape}, '
                       f'X_query shape{X_query.shape}, X_h_query shape{X_h_query.shape}')
 
             # Save the results locally
@@ -193,10 +175,7 @@ if __name__ == '__main__':
                                                 'subset selection for decomposition/low-dim learning only (ADDSUBRAND), '
                                                 'subset selection for both (SUBRANDADD)',
                         default='None', type=str)
-    parser.add_argument('-dis', '--dis_metric',
-                        help='Distance metric for cost aware BO. None: normal BO, 2: exp(L2 norm),'
-                             '10: exp(L_inf norm)',
-                        default=None, type=int)
+
     parser.add_argument('-ob', '--obj_metric', help='Metric used to compute objective function.',
                         default=2, type=int)
     parser.add_argument('-freq', '--update_freq', help='Frequency to update the surrogate hyperparameters.',
@@ -219,7 +198,6 @@ if __name__ == '__main__':
     low_dim = args.low_dim
     img_offset = args.img_offset
     n_init = args.n_init
-    dis_metric = args.dis_metric
     obj_metric = args.obj_metric
     update_freq = args.update_freq
     nsubspace = args.nsubspace
@@ -229,4 +207,4 @@ if __name__ == '__main__':
     BayesOpt_attack(obj_func=obj_func, model_type=model, acq_type=acq_func,
                     low_dim=low_dim, img_offset=img_offset, n_init=n_init, nsubspaces=nsubspace,
                     num_iter=n_itrs, ntargets=ntargets, target_label=target_label, dim_reduction=rd, seed=seed,
-                    cost_metric=dis_metric, obj_metric=obj_metric, update_freq=update_freq, sparse=sparse)
+                    obj_metric=obj_metric, update_freq=update_freq, sparse=sparse)

@@ -7,7 +7,6 @@ Created on Fri Nov 10 13:45:16 2017
 based on GPyOpt
 """
 
-import numpy as np
 from GPyOpt.util.general import get_quantiles
 
 
@@ -112,11 +111,6 @@ class LCB_budget(object):
         m, s = self.model.predict(x)
         f_acqu = - (m - self.beta * s)
 
-        if self.dis_metric is not None:
-            x = np.atleast_2d(x)
-            perturb_cost = (np.sum(x ** 2, axis=1) / (x.shape[1]))[:, None]
-            f_acqu = f_acqu / perturb_cost
-
         return f_acqu
 
     def _compute_acq_withGradients(self, x):
@@ -130,29 +124,21 @@ class LCB_budget(object):
         f_acqu = -m + self.beta * s
         df_acqu = -dmdx + self.beta * dsdx
 
-        if self.dis_metric is not None:
-            x = np.atleast_2d(x)
-            perturb_cost = (np.sum(x ** 2, axis=1) / (x.shape[1]))[:, None]
-            f_acqu = f_acqu / perturb_cost
-            df_acqu = df_acqu / perturb_cost
-
         return f_acqu, df_acqu
 
 
 class LCB_budget_additive(object):
 
-    def __init__(self, model, beta=3, dis_metric=None):
+    def __init__(self, model, beta=3):
         """
         Cost-aware LCB acquisition function with additive GP surrogate which encourages low perturbation costs
 
         :param model: BO surrogate model function
         :param beta: LCB exploration and exploitation trade-off parameter
-        :param dis_metric: perturbatino cost metric; if None, the acqusition equals to normal LCB acquisition function
         """
 
         self.model = model
         self.beta = beta
-        self.dis_metric = dis_metric
 
     def _compute_acq(self, x, subspace_id):
         """
@@ -163,13 +149,6 @@ class LCB_budget_additive(object):
 
         m, s = self.model.predictSub(x, subspace_id=subspace_id)
         f_acqu = - (m - self.beta * s)
-
-        if self.dis_metric is not None:
-            x = np.atleast_2d(x)
-            # perturb_cost = np.exp(np.linalg.norm(x, ord=self.dis_metric, axis=1))[:,None]
-            perturb_cost = (np.sum(x[:, self.model.active_dims_list[subspace_id]] ** 2, axis=1)
-                            / (x.shape[1] / self.model.n_sub))[:, None]
-            f_acqu = f_acqu / perturb_cost
 
         return f_acqu
 
@@ -185,10 +164,4 @@ class LCB_budget_additive(object):
         f_acqu = -m + self.beta * s
         df_acqu = -dmdx + self.beta * dsdx
 
-        if self.dis_metric is not None:
-            x = np.atleast_2d(x)
-            perturb_cost = (np.sum(x[:, self.model.active_dims_list[subspace_id]] ** 2, axis=1)
-                            / (x.shape[1] / self.model.n_sub))[:, None]
-            f_acqu = f_acqu / perturb_cost
-            df_acqu = df_acqu / perturb_cost
         return f_acqu, df_acqu

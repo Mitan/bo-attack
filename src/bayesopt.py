@@ -5,7 +5,7 @@ import time
 
 import numpy as np
 
-from src.acq_funcs.acqoptimizer import AcqOptimizer
+from src.acq_funcs.acquisition_optimizer import AcqOptimizer
 from src.acq_funcs.acquisitions import LCB_budget, LCB_budget_additive
 from src.models.additive_gp_decomp import Additive_GPModel_Learn_Decomp
 from src.models.gpdr import GPModelLDR
@@ -30,7 +30,7 @@ class Bayes_opt():
     def initialise(self, X_init=None, Y_init=None, model_type='GP',
                    acq_type='LCB', batch_option='CL', sparse=None, seed=42, nchannel=3,
                    high_dim=int(32 * 32),
-                   ARD=False, cost_metric=None, nsubspaces=1, normalize_Y=True, update_freq=10, dim_reduction='BILI'):
+                   ARD=False, nsubspaces=1, normalize_Y=True, update_freq=10, dim_reduction='BILI'):
         """
         :param X_init: initial observation input data
         :param Y_init: initial observation input data
@@ -95,17 +95,15 @@ class Bayes_opt():
 
         # Choose the acquisition function for BO
         if self.acq_type == 'LCB':
-            if cost_metric == 10:
-                cost_metric = np.inf
             if model_type.startswith('ADDGP'):
-                acqu_func = LCB_budget_additive(self.model, dis_metric=cost_metric)
+                acqu_func = LCB_budget_additive(self.model)
             else:
-                acqu_func = LCB_budget(self.model, dis_metric=cost_metric)
+                acqu_func = LCB_budget(self.model)
         else:
             print('Not implemented')
-        self.query_strategy = AcqOptimizer(model=self.model, acqu_func=acqu_func, bounds=self.bounds,
-                                           model_name=model_type,
-                                           nsubspace=nsubspaces)
+        self.acq_optimizer = AcqOptimizer(model=self.model, acqu_func=acqu_func, bounds=self.bounds,
+                                          model_name=model_type,
+                                          nsubspace=nsubspaces)
 
     def run(self, total_iterations):
         """
@@ -142,7 +140,7 @@ class Bayes_opt():
 
             # Optimise the acquisition function to get the next query point and evaluate at next query point
             start_time_opt = time.time()
-            x_next_batch, acqu_value_batch = self.query_strategy.get_next(self.X)
+            x_next_batch, acqu_value_batch = self.acq_optimizer.get_next(self.X)
             max_acqu_value = np.max(acqu_value_batch)
             t_opt_acq = time.time() - start_time_opt
             time_record[k, 0] = t_opt_acq
