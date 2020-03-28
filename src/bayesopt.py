@@ -118,38 +118,39 @@ class Bayes_opt():
 
             # Optimise the acquisition function to get the next query point and evaluate at next query point
             start_time_opt = time.time()
-            x_next_batch, acqu_value_batch = self.acq_optimizer.get_next(self.X)
-            max_acqu_value = np.max(acqu_value_batch)
+            x_next, _ = self.acq_optimizer.get_next(self.X)
+            print("type is {} shape is {}".format(type(x_next), x_next.shape))
+
             t_opt_acq = time.time() - start_time_opt
             time_record[k, 0] = t_opt_acq
 
             # # Upsample the observed data to image dimension in the case of auto-learning of d^r after each iteration
             # if self.gp_type == GPEnum.LearnDimGP:
             #     self.opt_dr_list.append(self.gp_model.opt_dr)
-            #     x_curr_dim = x_next_batch.shape[1]
+            #     x_curr_dim = x_next.shape[1]
             #     if int(x_curr_dim / self.nchannel) < self.high_dim:
-            #         x_next_batch = upsample_projection(self.dim_reduction, x_next_batch,
+            #         x_next = upsample_projection(self.dim_reduction, x_next,
             #                                            low_dim=int(x_curr_dim / self.nchannel), high_dim=self.high_dim,
             #                                            nchannel=self.nchannel)
             # else:
             self.opt_dr_list.append(np.atleast_2d(0))
 
             # Evaluate the objective function at the next query point
-            y_next_batch = self.func(x_next_batch) + np.random.normal(0, np.sqrt(self.noise_var),
-                                                                      (x_next_batch.shape[0], 1))
+            y_next = self.func(x_next) + np.random.normal(0, np.sqrt(self.noise_var),
+                                                                      (x_next.shape[0], 1))
             # Augment the observed data
-            self.X = np.vstack((self.X, x_next_batch))
-            self.Y = np.vstack((self.Y, y_next_batch))
+            self.X = np.vstack((self.X, x_next))
+            self.Y = np.vstack((self.Y, y_next))
             self.minY = np.min(self.Y)
 
             #  Store the intermediate BO results
-            X_query = np.vstack((X_query, np.atleast_2d(x_next_batch)))
-            Y_query = np.vstack((Y_query, np.atleast_2d(y_next_batch)))
+            X_query = np.vstack((X_query, np.atleast_2d(x_next)))
+            Y_query = np.vstack((Y_query, np.atleast_2d(y_next)))
             X_opt = np.concatenate((X_opt, np.atleast_2d(X_query[np.argmin(Y_query), :])))
             Y_opt = np.concatenate((Y_opt, np.atleast_2d(min(Y_query))))
 
             print(f'{self.gp_type}{self.acq_type} ||'
-                  f'seed:{self.seed},itr:{k}, y_next:{np.min(y_next_batch)}, y_opt:{Y_opt[-1, :]}')
+                  f'seed:{self.seed},itr:{k}, y_next:{np.min(y_next)}, y_opt:{Y_opt[-1, :]}')
 
             # Terminate the BO loop if the attack succeeds
             if min(Y_query) <= 0:

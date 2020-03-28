@@ -22,6 +22,7 @@ def load_or_generate_init_data(results_file_name, f, n_init, x_bounds):
     print(f'X init shape {x_init.shape}')
     return x_init, y_init
 
+
 def generate_init_data(obj_func, n_init, bounds, method='lhs'):
     """
     Generate initial data for starting BO

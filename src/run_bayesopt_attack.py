@@ -88,6 +88,7 @@ def BayesOpt_attack(dataset_type, model_type, acq_type, low_dim, sparse, seed,
                                                         f=f,
                                                         n_init=n_init,
                                                         x_bounds=x_bounds)
+            print('shapes {} {}'.format(x_init.shape, y_init.shape))
 
             # Initialise BO
             bayes_opt = Bayes_opt(func=f, bounds=x_bounds, saving_path=failed_file_name)
@@ -99,12 +100,8 @@ def BayesOpt_attack(dataset_type, model_type, acq_type, low_dim, sparse, seed,
             X_query_full, Y_query, X_opt_full, Y_opt, time_record = bayes_opt.run(total_iterations=num_iter)
 
             # Reduce the memory needed for storing results
-            if model_type==GPEnum.LearnDimGP:
-                X_query = X_query_full[-2:]
-                X_opt = X_opt_full[-2:]
-            else:
-                X_query = X_query_full
-                X_opt = X_opt_full[-2:]
+            X_query = X_query_full
+            X_opt = X_opt_full[-2:]
 
             # Store the results
             Y_opt_all_slices.append(Y_opt)
