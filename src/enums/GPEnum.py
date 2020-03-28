@@ -3,5 +3,4 @@ def my_enum(**enums):
 
 
 GPEnum = my_enum(SimpleGP=1,
-                 AdditiveGP=2,
-                 LearnDimGP=3)
+                 AdditiveGP=2)

@@ -30,9 +30,6 @@ def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
         nchannel = 3
         epsilon = 0.05
 
-    if model_type == GPEnum.LearnDimGP:
-        low_dim = high_dim
-
     x_bounds = np.vstack([[-1, 1]] * low_dim * nchannel)
 
     # Specify the experiment results saving directory
@@ -62,10 +59,12 @@ def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
         target_label = cnn.target_label[0]
         print(f'id={img_offset}, origin={input_label}, target={target_label}, eps={epsilon}, dr={low_dim}')
 
-        if model_type == GPEnum.LearnDimGP:
-            f = lambda x: cnn.np_evaluate(x)
-        else:
-            f = lambda x: cnn.np_upsample_evaluate(x)
+        # if model_type == GPEnum.LearnDimGP:
+        #     f = lambda x: cnn.np_evaluate(x)
+        # else:
+        #     f = lambda x: cnn.np_upsample_evaluate(x)
+
+        f = lambda x: cnn.np_upsample_evaluate(x)
 
         # Define the name of results file and failure fail(for debug or resume)
         results_file_name = os.path.join(results_data_folder,
@@ -103,7 +102,6 @@ def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
             bayes_opt = Bayes_opt(func=f, bounds=x_bounds, saving_path=failed_file_name)
             bayes_opt.initialise(X_init=x_init, Y_init=y_init, gp_type=model_type, acq_type=acq_type,
                                  sparse=sparse, nsubspaces=nsubspaces, update_freq=update_freq,
-                                 nchannel=nchannel, high_dim=high_dim, dim_reduction=dim_reduction,
                                  seed=seed)
 
             # Run BO
@@ -153,7 +151,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--func', help='Objective function(datasets): mnist, cifar10',
                         default='mnist', type=str)
     parser.add_argument('-m', '--model', help='Surrogate model: GP or ADDGPLD or ADDGPFD or GPLDR',
-                        default=GPEnum.LearnDimGP, type=int)
+                        default=GPEnum.SimpleGP, type=int)
     parser.add_argument('-acq', '--acq_func', help='Acquisition function type: LCB, EI',
                         default=AcquisitionEnum.LCB, type=int)
 

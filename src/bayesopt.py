@@ -9,7 +9,6 @@ from acq_funcs.acq_function_factory import AcquisitionFunctionFactory
 from enums.AcquisitionEnum import AcquisitionEnum
 from enums.GPEnum import GPEnum
 from gp.gp_factory import GaussianProcessFactory
-from src.utilities.upsampler import upsample_projection
 
 
 class Bayes_opt():
@@ -29,10 +28,17 @@ class Bayes_opt():
         self.gp_factory = GaussianProcessFactory()
         self.acq_factory = AcquisitionFunctionFactory()
 
-    def initialise(self, X_init=None, Y_init=None, gp_type=GPEnum.SimpleGP,
-                   acq_type=AcquisitionEnum.LCB, sparse=None, seed=42, nchannel=3,
-                   high_dim=int(32 * 32),
-                   ARD=False, nsubspaces=1, normalize_Y=True, update_freq=10, dim_reduction='BILI'):
+    def initialise(self,
+                   X_init=None,
+                   Y_init=None,
+                   gp_type=GPEnum.SimpleGP,
+                   acq_type=AcquisitionEnum.LCB,
+                   sparse=None,
+                   seed=42,
+                   ARD=False,
+                   nsubspaces=1,
+                   normalize_Y=True,
+                   update_freq=10):
         """
         :param X_init: initial observation input data
         :param Y_init: initial observation input data
@@ -41,14 +47,11 @@ class Bayes_opt():
         :param batch_size: the number of new query locations in the batch (=1 for sequential BO and > 1 for parallel BO)
         :param sparse: sparse GP options
         :param seed: random seed
-        :param nchannel: number of image channels
-        :param high_dim: image dimension (e.g. 32x32 for CIFAR10) or high-dimensional search space for imagenet (96x96)
         :param ARD: ARD option for GP models
         :param cost_metric: perturbatino cost metric; if None, the acqusition equals to normal LCB acquisition function
         :param nsubspaces: number of subspaces in the decomposition for ADDGP only
         :param normalize_Y: normalise output data
         :param update_freq: frequency of relearning GP hyperparameters
-        :param dim_reduction: dimension reduction method used in upsampling
         """
         assert X_init.ndim == 2, "X_init has to be 2D array"
         assert Y_init.ndim == 2, "Y_init has to be 2D array"
@@ -60,10 +63,7 @@ class Bayes_opt():
         self.acq_type = acq_type
         self.gp_type = gp_type
         self.seed = seed
-        self.nchannel = nchannel
         self.X_dim = self.X.shape[1]
-        self.high_dim = high_dim
-        self.dim_reduction = dim_reduction
 
         # Find the minimum observed functional value and its location
         self.arg_opt = np.atleast_2d(self.X[np.argmin(self.Y)])
@@ -73,12 +73,9 @@ class Bayes_opt():
                                                noise_var=self.noise_var,
                                                ARD=ARD,
                                                seed=seed,
-                                               high_dim=high_dim,
-                                               dim_reduction=dim_reduction,
                                                sparse=sparse,
                                                normalize_Y=normalize_Y,
                                                update_freq=update_freq,
-                                               nchannel=nchannel,
                                                nsubspaces=nsubspaces)
 
         self.acq_optimizer = self.acq_factory.get_acq_optimizer(acq_type=acq_type,
@@ -105,15 +102,14 @@ class Bayes_opt():
         X_opt = np.copy(np.atleast_2d(self.arg_opt))
         Y_opt = np.copy(np.atleast_2d(self.minY))
         time_record = np.zeros([total_iterations, 2])
-        self.e = np.exp(1)
         self.opt_dr_list = []
 
-        # Upsample the observed data to image dimension in the case of auto-learning of d^r
-        if self.gp_type == GPEnum.LearnDimGP:
-            x_curr_dim = self.X.shape[1]
-            if int(x_curr_dim / self.nchannel) < self.high_dim:
-                self.X = upsample_projection(self.dim_reduction, X_query, low_dim=int(x_curr_dim / self.nchannel),
-                                             high_dim=self.high_dim, nchannel=self.nchannel)
+        # # Upsample the observed data to image dimension in the case of auto-learning of d^r
+        # if self.gp_type == GPEnum.LearnDimGP:
+        #     x_curr_dim = self.X.shape[1]
+        #     if int(x_curr_dim / self.nchannel) < self.high_dim:
+        #         self.X = upsample_projection(self.dim_reduction, X_query, low_dim=int(x_curr_dim / self.nchannel),
+        #                                      high_dim=self.high_dim, nchannel=self.nchannel)
 
         # Fit GP model to the observed data
         self.gp_model._update_model(self.X, self.Y, itr=0)
@@ -127,16 +123,16 @@ class Bayes_opt():
             t_opt_acq = time.time() - start_time_opt
             time_record[k, 0] = t_opt_acq
 
-            # Upsample the observed data to image dimension in the case of auto-learning of d^r after each iteration
-            if self.gp_type == GPEnum.LearnDimGP:
-                self.opt_dr_list.append(self.gp_model.opt_dr)
-                x_curr_dim = x_next_batch.shape[1]
-                if int(x_curr_dim / self.nchannel) < self.high_dim:
-                    x_next_batch = upsample_projection(self.dim_reduction, x_next_batch,
-                                                       low_dim=int(x_curr_dim / self.nchannel), high_dim=self.high_dim,
-                                                       nchannel=self.nchannel)
-            else:
-                self.opt_dr_list.append(np.atleast_2d(0))
+            # # Upsample the observed data to image dimension in the case of auto-learning of d^r after each iteration
+            # if self.gp_type == GPEnum.LearnDimGP:
+            #     self.opt_dr_list.append(self.gp_model.opt_dr)
+            #     x_curr_dim = x_next_batch.shape[1]
+            #     if int(x_curr_dim / self.nchannel) < self.high_dim:
+            #         x_next_batch = upsample_projection(self.dim_reduction, x_next_batch,
+            #                                            low_dim=int(x_curr_dim / self.nchannel), high_dim=self.high_dim,
+            #                                            nchannel=self.nchannel)
+            # else:
+            self.opt_dr_list.append(np.atleast_2d(0))
 
             # Evaluate the objective function at the next query point
             y_next_batch = self.func(x_next_batch) + np.random.normal(0, np.sqrt(self.noise_var),
@@ -160,7 +156,7 @@ class Bayes_opt():
                 break
 
             # Update the surrogate model with new data
-            start_time_update = time.time()
+            # start_time_update = time.time()
             try:
                 self.gp_model._update_model(self.X, self.Y, itr=k)
             except:
@@ -173,9 +169,9 @@ class Bayes_opt():
                     pickle.dump(partial_results, file)
                 print('This BO target failed')
                 assert False
-            t_update_model = time.time() - start_time_update
-            time_record[k, 1] = t_update_model
-            print(f'Time for optimising acquisition function={t_opt_acq}; '
-                  f'Time for updating the model={t_update_model}')
+            # t_update_model = time.time() - start_time_update
+            # time_record[k, 1] = t_update_model
+            # print(f'Time for optimising acquisition function={t_opt_acq}; '
+            #       f'Time for updating the model={t_update_model}')
 
         return X_query, Y_query, X_opt, Y_opt, time_record
