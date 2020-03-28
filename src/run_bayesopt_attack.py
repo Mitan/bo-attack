@@ -91,7 +91,7 @@ def BayesOpt_attack(dataset_type, model_type, acq_type, low_dim, sparse, seed,
             print('shapes {} {}'.format(x_init.shape, y_init.shape))
 
             # Initialise BO
-            bayes_opt = Bayes_opt(func=f, bounds=x_bounds, saving_path=failed_file_name)
+            bayes_opt = Bayes_opt(cnn=cnn, func=f, bounds=x_bounds, saving_path=failed_file_name)
             bayes_opt.initialise(X_init=x_init, Y_init=y_init, gp_type=model_type, acq_type=acq_type,
                                  sparse=sparse, nsubspaces=nsubspaces, update_freq=update_freq,
                                  seed=seed)

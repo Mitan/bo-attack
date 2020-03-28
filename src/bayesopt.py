@@ -12,10 +12,11 @@ from gp.gp_factory import GaussianProcessFactory
 
 
 class Bayes_opt():
-    def __init__(self, func, bounds, saving_path):
+    def __init__(self, cnn, func, bounds, saving_path):
         """
         Bayesian Optimisation algorithm
 
+        :type cnn: the cnn to be attacked. Needed only to get attack status
         :param func: the objective function to be optimised
         :param bounds: the input space bounds
         :param saving_path: saving path for failed BO runs (rarely occurred)
@@ -27,6 +28,8 @@ class Bayes_opt():
         self.saving_path = saving_path
         self.gp_factory = GaussianProcessFactory()
         self.acq_factory = AcquisitionFunctionFactory()
+        # TODO fix
+        self.cnn = cnn
 
     def initialise(self,
                    X_init=None,
@@ -153,7 +156,8 @@ class Bayes_opt():
                   f'seed:{self.seed},itr:{k}, y_next:{np.min(y_next)}, y_opt:{Y_opt[-1, :]}')
 
             # Terminate the BO loop if the attack succeeds
-            if min(Y_query) <= 0:
+            # todo do we really need cnn here
+            if min(Y_query) <= 0 or self.cnn.success:
                 break
 
             # Update the surrogate model with new data
