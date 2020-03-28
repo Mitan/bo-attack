@@ -98,6 +98,7 @@ class CNN(object):
 
         # Get the original image label and save original image
         self.X_origin = self.all_orig_img[i:i + 1]
+
         self.orig_img_id = self.all_orig_img_id[i:i + 1][0]
         self.input_label = self.all_orig_labels_int[i:i + 1][0]
         X_orig_img_file = os.path.join(self.results_folder,
@@ -207,6 +208,22 @@ class CNN(object):
         delta_vector_hg_np = upsample_projection(self.dim_reduction, delta_vector_np, self.low_dim, self.high_dim,
                                                  nchannel=self.nchannel)
         score = self.evaluate(delta_vector_hg_np)
+        return score
+
+    def np_decode_evaluate(self, delta_vector_small_dim, decoder):
+        """
+        :type decoder: decoder to perform the upsampling
+        :param delta_vector_np: adversarial perturbation in the range of [-1, 1] with dimension (low_dim x nchannel)
+        :return score: objective function value
+        """
+
+        # todo check if it's correct to multiply by epsilon before or after decoding
+        # Scale the adversarial delta to [-epsilon, + epsilon]
+        delta_vector_np = delta_vector_small_dim
+
+        delta_vector_decoded = decoder.predict(delta_vector_np) * self.epsilon
+
+        score = self.evaluate(delta_vector_decoded)
         return score
 
     def np_upsample_evaluate_bili(self, delta_vector_ld_np):

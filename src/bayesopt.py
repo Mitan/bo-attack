@@ -122,7 +122,6 @@ class Bayes_opt():
             # Optimise the acquisition function to get the next query point and evaluate at next query point
             start_time_opt = time.time()
             x_next, _ = self.acq_optimizer.get_next(self.X)
-            print("type is {} shape is {}".format(type(x_next), x_next.shape))
 
             t_opt_acq = time.time() - start_time_opt
             time_record[k, 0] = t_opt_acq

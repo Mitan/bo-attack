@@ -14,6 +14,7 @@ from src.bayesopt import Bayes_opt
 from src.objective_func.objective_functions_tf import CNN
 from src.utilities.upsampler import upsample_projection
 from src.utilities.utilities import load_or_generate_init_data
+from vae_models.vae_mnist_keras import MnistVariationalAutoEncoder
 
 
 def BayesOpt_attack(dataset_type, model_type, acq_type, low_dim, sparse, seed,
@@ -43,6 +44,10 @@ def BayesOpt_attack(dataset_type, model_type, acq_type, low_dim, sparse, seed,
               obj_metric=obj_metric, results_folder=results_data_folder,
               directory=directory)
 
+    # get and train VAE for dimensionality reduction
+    vae = MnistVariationalAutoEncoder(latent_dim=low_dim)
+    vae.train(epochs=10)
+
     # For each image, define the target class
     if ntargets > 1:
         target_list = list(range(ntargets))
@@ -57,12 +62,8 @@ def BayesOpt_attack(dataset_type, model_type, acq_type, low_dim, sparse, seed,
         target_label = cnn.target_label[0]
         print(f'id={img_offset}, origin={input_label}, target={target_label}, eps={epsilon}, dr={low_dim}')
 
-        # if model_type == GPEnum.LearnDimGP:
-        #     f = lambda x: cnn.np_evaluate(x)
-        # else:
-        #     f = lambda x: cnn.np_upsample_evaluate(x)
-
-        f = lambda x: cnn.np_upsample_evaluate(x)
+        # f = lambda x: cnn.np_upsample_evaluate(x)
+        f = lambda x: cnn.np_decode_evaluate(x, vae.decoder)
 
         # Define the name of results file and failure fail(for debug or resume)
         results_file_name = os.path.join(results_data_folder,
@@ -144,7 +145,7 @@ if __name__ == '__main__':
                         default=AcquisitionEnum.LCB, type=int)
 
     parser.add_argument('-ld', '--low_dim', help='Dimension of reduced subspace.',
-                        default=196, type=int)
+                        default=25, type=int)
     parser.add_argument('-init', '--n_init', help='Initial number of observation.',
                         default=30, type=int)
     parser.add_argument('-nitr', '--max_itr', help='Max BO iterations.',
