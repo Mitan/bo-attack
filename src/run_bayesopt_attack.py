@@ -140,12 +140,12 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--func', help='Objective function(datasets): mnist, cifar10',
                         default=DatasetEnum.MNIST, type=int)
     parser.add_argument('-m', '--model', help='Surrogate model: GP or ADDGPLD or ADDGPFD or GPLDR',
-                        default=GPEnum.SimpleGP, type=int)
+                        default=GPEnum.AdditiveGP, type=int)
     parser.add_argument('-acq', '--acq_func', help='Acquisition function type: LCB, EI',
                         default=AcquisitionEnum.LCB, type=int)
 
     parser.add_argument('-ld', '--low_dim', help='Dimension of reduced subspace.',
-                        default=25, type=int)
+                        default=196, type=int)
     parser.add_argument('-init', '--n_init', help='Initial number of observation.',
                         default=30, type=int)
     parser.add_argument('-nitr', '--max_itr', help='Max BO iterations.',

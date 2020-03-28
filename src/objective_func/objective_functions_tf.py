@@ -219,9 +219,9 @@ class CNN(object):
 
         # todo check if it's correct to multiply by epsilon before or after decoding
         # Scale the adversarial delta to [-epsilon, + epsilon]
-        delta_vector_np = delta_vector_small_dim
+        delta_vector_np = delta_vector_small_dim * self.epsilon
 
-        delta_vector_decoded = decoder.predict(delta_vector_np) * self.epsilon
+        delta_vector_decoded = decoder.predict(delta_vector_np)
 
         score = self.evaluate(delta_vector_decoded)
         return score
