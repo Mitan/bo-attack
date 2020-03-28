@@ -1,5 +1,5 @@
-from acq_funcs.acquisition_optimizer import AcqOptimizer
-from acq_funcs.acquisitions import LCB_budget_additive, LCB_budget
+from acq_funcs.AcquisitionOptimizer import AcqOptimizer
+from acq_funcs.Acquisitions import LCB_budget_additive, LCB_budget
 from enums.AcquisitionEnum import AcquisitionEnum
 from enums.GPEnum import GPEnum
 

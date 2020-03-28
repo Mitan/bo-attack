@@ -5,7 +5,7 @@ import time
 
 import numpy as np
 
-from acq_funcs.acq_function_factory import AcquisitionFunctionFactory
+from acq_funcs.AcqFunctionFactory import AcquisitionFunctionFactory
 from enums.AcquisitionEnum import AcquisitionEnum
 from enums.GPEnum import GPEnum
 from gp.gp_factory import GaussianProcessFactory

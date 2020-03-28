@@ -6,41 +6,39 @@ import pickle
 
 import numpy as np
 
+from dataset_descriptors.DatasetDescriptionFactory import DatasetDescriptionFactory
 from enums.AcquisitionEnum import AcquisitionEnum
+from enums.DatasetEnum import DatasetEnum
 from enums.GPEnum import GPEnum
 from src.bayesopt import Bayes_opt
 from src.objective_func.objective_functions_tf import CNN
 from src.utilities.upsampler import upsample_projection
-from src.utilities.utilities import get_init_data
+from src.utilities.utilities import load_or_generate_init_data
 
 
-def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
+def BayesOpt_attack(dataset_type, model_type, acq_type, low_dim, sparse, seed,
                     img_offset, n_init=50, num_iter=40, ntargets=9, target_label=0, dim_reduction='BILI',
                     obj_metric=1, update_freq=10, nsubspaces=1):
     # Specify code directory
     directory = './'
 
-    if obj_func == 'mnist':
-        high_dim = 784
-        nchannel = 1
-        epsilon = 0.3
+    dataset_descriptor = DatasetDescriptionFactory().get_dataset_descriptor(dataset_type)
 
-    elif obj_func == 'cifar10':
-        high_dim = int(32 * 32)
-        nchannel = 3
-        epsilon = 0.05
+    high_dim = dataset_descriptor.dim
+    nchannel = dataset_descriptor.channels
+    epsilon = dataset_descriptor.epsilon
 
     x_bounds = np.vstack([[-1, 1]] * low_dim * nchannel)
 
     # Specify the experiment results saving directory
 
-    results_data_folder = f'../tests/exp_results/{obj_func}_tf_{model_type}_ob{obj_metric}_' \
+    results_data_folder = f'../tests/exp_results/{dataset_descriptor.name_string}_tf_{model_type}_ob{obj_metric}_' \
                           f'_freq{update_freq}_ld{low_dim}_{dim_reduction}/'
     if not os.path.exists(results_data_folder):
         os.makedirs(results_data_folder)
 
     # Define the model and the original images to be attacked
-    cnn = CNN(dataset_name=obj_func, img_offset=img_offset, epsilon=epsilon,
+    cnn = CNN(dataset_name=dataset_type, img_offset=img_offset, epsilon=epsilon,
               dim_reduction=dim_reduction, low_dim=low_dim, high_dim=high_dim,
               obj_metric=obj_metric, results_folder=results_data_folder,
               directory=directory)
@@ -86,17 +84,10 @@ def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
             # Specify the random seed
             np.random.seed(seed)
 
-            # Generate initial observation data for BO
-            if os.path.exists(results_file_name) and 'LDR' not in model_type:
-                print('load old init data')
-                with open(results_file_name, 'rb') as pre_file:
-                    previous_bo_results = pickle.load(pre_file)
-                x_init = previous_bo_results['X_reduced_query'][0]
-                y_init = previous_bo_results['Y_query'][0]
-            else:
-                print('generate new init data')
-                x_init, y_init = get_init_data(obj_func=f, n_init=n_init, bounds=x_bounds)
-            print(f'X init shape {x_init.shape}')
+            x_init, y_init = load_or_generate_init_data(results_file_name=results_file_name,
+                                                        f=f,
+                                                        n_init=n_init,
+                                                        x_bounds=x_bounds)
 
             # Initialise BO
             bayes_opt = Bayes_opt(func=f, bounds=x_bounds, saving_path=failed_file_name)
@@ -149,7 +140,7 @@ def BayesOpt_attack(obj_func, model_type, acq_type, low_dim, sparse, seed,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Run BayesOpt Experiments")
     parser.add_argument('-f', '--func', help='Objective function(datasets): mnist, cifar10',
-                        default='mnist', type=str)
+                        default=DatasetEnum.MNIST, type=int)
     parser.add_argument('-m', '--model', help='Surrogate model: GP or ADDGPLD or ADDGPFD or GPLDR',
                         default=GPEnum.SimpleGP, type=int)
     parser.add_argument('-acq', '--acq_func', help='Acquisition function type: LCB, EI',
@@ -188,7 +179,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     print(f"Got arguments: \n{args}")
-    obj_func = args.func
+    dataset_type = args.func
     model = args.model
     acq_func = args.acq_func
     n_itrs = args.max_itr
@@ -204,7 +195,7 @@ if __name__ == '__main__':
     sparse = args.sparse
     seed = args.seed
 
-    BayesOpt_attack(obj_func=obj_func, model_type=model, acq_type=acq_func,
+    BayesOpt_attack(dataset_type=dataset_type, model_type=model, acq_type=acq_func,
                     low_dim=low_dim, img_offset=img_offset, n_init=n_init, nsubspaces=nsubspace,
                     num_iter=n_itrs, ntargets=ntargets, target_label=target_label, dim_reduction=rd, seed=seed,
                     obj_metric=obj_metric, update_freq=update_freq, sparse=sparse)

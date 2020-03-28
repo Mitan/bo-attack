@@ -1,13 +1,28 @@
 # @author: Robin Ru (robin@robots.ox.ac.uk)
-
+import os
 import numpy as np
 from pyDOE import lhs
 from scipy.optimize import fmin_l_bfgs_b
+import pickle
 
 from src.utilities.upsampler import downsample_projection
 
 
-def get_init_data(obj_func, n_init, bounds, method='lhs'):
+def load_or_generate_init_data(results_file_name, f, n_init, x_bounds):
+    # Generate initial observation data for BO
+    if os.path.exists(results_file_name):
+        print('load old init data')
+        with open(results_file_name, 'rb') as pre_file:
+            previous_bo_results = pickle.load(pre_file)
+        x_init = previous_bo_results['X_reduced_query'][0]
+        y_init = previous_bo_results['Y_query'][0]
+    else:
+        print('generate new init data')
+        x_init, y_init = generate_init_data(obj_func=f, n_init=n_init, bounds=x_bounds)
+    print(f'X init shape {x_init.shape}')
+    return x_init, y_init
+
+def generate_init_data(obj_func, n_init, bounds, method='lhs'):
     """
     Generate initial data for starting BO
 

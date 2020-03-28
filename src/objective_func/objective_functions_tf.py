@@ -7,6 +7,7 @@ import os
 import numpy as np
 
 import src.objective_func.tf_models.Utils as util
+from enums.DatasetEnum import DatasetEnum
 from src.objective_func.tf_models.setup_cifar import CIFAR, CIFARModel
 from src.objective_func.tf_models.setup_mnist import MNIST, MNISTModel
 from src.utilities.upsampler import upsample_projection
@@ -43,27 +44,22 @@ class CNN(object):
         folder_path = os.path.join(directory, 'objective_func/tf_models/')
 
         # Get the image data and the target model
-        if 'mnist' in dataset_name:
+        if dataset_name==DatasetEnum.MNIST:
             self.d1 = 28
             self.nchannel = 1
             self.dataset_name = 'mnist'
             self.total_classes = 10
             data, model = MNIST(folder_path), MNISTModel(f'{folder_path}models/mnist', use_softmax=True)
 
-        elif 'cifar10' in dataset_name:
+        elif dataset_name==DatasetEnum.CIFAR10:
             self.d1 = 32
             self.nchannel = 3
             self.total_classes = 10
             self.dataset_name = 'cifar10'
             data, model = CIFAR(folder_path), CIFARModel(f'{folder_path}models/cifar', use_softmax=True)
 
-        elif 'imagenet' in dataset_name:
-            from objective_func.tf_models.setup_inception import InceptionModel, ImageNetDataNP
-            self.d1 = 299
-            self.nchannel = 3
-            self.total_classes = 1001  # num_labels in InceptionModel is 1001
-            self.dataset_name = 'imagenet'
-            data, model = ImageNetDataNP(folder_path), InceptionModel(folder_path, use_softmax=True)
+        else:
+            raise NotImplementedError
 
         random_target = False
         shift_index = False
@@ -71,13 +67,7 @@ class CNN(object):
         print(f'Loading data and classification model: {self.dataset_name}')
 
         # Get the correctly classified image data to be attacked
-        if 'imagenet' in dataset_name:
-            # find all possible class
-            all_class = np.array(range(int(self.total_classes - 1)))
-            all_orig_img, all_target_labels, all_orig_labels, all_orig_img_id = util.generate_attack_data_set(
-                data, num_img, img_offset, model, attack_type=attack_type, random_target_class=all_class,
-                shift_index=True)
-        elif random_target:
+        if random_target:
             # random target on all possible classes
             class_num = data.test_labels.shape[1]
             all_orig_img, all_target_labels, all_orig_labels, all_orig_img_id = util.generate_attack_data_set(
@@ -94,8 +84,8 @@ class CNN(object):
         self.all_orig_labels_int = np.argmax(all_orig_labels, 1)
 
         # Check the original image labels
-        if (dataset_name == 'mnist' or dataset_name == 'cifar10'):
-            if (self.all_orig_labels_int[0] != self.all_orig_labels_int[-1]):
+        if dataset_name ==  DatasetEnum.MNIST or dataset_name == DatasetEnum.CIFAR10:
+            if self.all_orig_labels_int[0] != self.all_orig_labels_int[-1]:
                 assert False
 
     def get_data_sample(self, i=0):
@@ -112,10 +102,8 @@ class CNN(object):
         self.input_label = self.all_orig_labels_int[i:i + 1][0]
         X_orig_img_file = os.path.join(self.results_folder,
                                        f'X_{self.dataset_name}_origin_{self.input_label}_id{self.orig_img_id}')
-        if 'imagenet' in self.dataset_name:
-            np.save(X_orig_img_file, np.array([0]))
-        else:
-            np.save(X_orig_img_file, self.X_origin)
+
+        np.save(X_orig_img_file, self.X_origin)
 
         # Get the attack target label
         target_label_vector = self.all_target_labels[i:i + 1]
@@ -168,10 +156,8 @@ class CNN(object):
             X_success_saving_path = os.path.join(self.results_folder,
                                                  f'X_{self.dataset_name}_adv_i{self.input_label}_t{self.target_label[0]}_'
                                                  f'eps{self.epsilon}_id{self.orig_img_id}')
-            if 'imagenet' in self.dataset_name:
-                np.save(X_success_saving_path, np.array([0]))
-            else:
-                np.save(X_success_saving_path, X_success_adv)
+
+            np.save(X_success_saving_path, X_success_adv)
         else:
             self.success = False
             print(f'attack succeed={False}|| origin={self.input_label}| target={self.target_label[0]}|'
