@@ -5,6 +5,11 @@ A class for runner the outer BO loop on dimensions
 from bo.DimensionBORunner import DimensionBORunner
 import numpy as np
 
+# the paper uses 30 initial evaluations
+# 900 max iterations
+# GP update frequency of 5 iterations
+# learning the dimension with frequency 8 * update_for_hypers, i.e. 8 * 5
+
 
 class BORunner:
     def __init__(self, domain_dimensions):
@@ -66,7 +71,7 @@ class BORunner:
                 break
 
             # if we haven't found the successful attack at this dimension
-            
+
             # update the outer BO loop with the dimension and best found value for it
             self.dimension_bo_runner.update_history_data(dimension=next_dimension,
                                                          measurement=best_measurement)
