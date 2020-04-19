@@ -10,7 +10,7 @@ from dataset_descriptors.DatasetDescriptionFactory import DatasetDescriptionFact
 from enums.AcquisitionEnum import AcquisitionEnum
 from enums.DatasetEnum import DatasetEnum
 from enums.GPEnum import GPEnum
-from src.bayesopt import Bayes_opt
+from src.bo.bayesopt import Bayes_opt
 from src.objective_func.objective_functions_tf import CNN
 from src.utilities.upsampler import upsample_projection
 from src.utilities.utilities import load_or_generate_init_data
