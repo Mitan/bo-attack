@@ -14,7 +14,6 @@ class DimensionBORunner:
          :type domain_dimensions (arraylike):  the list of the dimensions to select from
         """
         self.domain_dimensions = domain_dimensions
-
         # list of selected dimensions
         self.history_dimensions = []
         # list of the measurements of the corresponding dimensions
@@ -56,3 +55,7 @@ class DimensionBORunner:
                 best_x = next_x
                 best_val = ei
         return best_x
+
+    def update_history_data(self, dimension, measurement):
+        self.history_dimensions = np.append(self.history_dimensions, np.atleast_2d(dimension), axis=0)
+        self.history_measurements = np.append(self.history_measurements, measurement)

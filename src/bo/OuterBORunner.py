@@ -1,13 +1,8 @@
 """
 A class for runner the outer BO loop on dimensions
 """
-import math
-
-import GPy
-import numpy as np
 
 from bo.DimensionBORunner import DimensionBORunner
-from utilities.Utils import ei_acquizition_function
 
 
 class OuterBORunner:
@@ -35,5 +30,7 @@ class OuterBORunner:
 
     # run the BO procedure using BO-BOS
     def run_bo_for_fixed_dimension(self, dimension):
-        raise NotImplemented
+        measurement = 0
+        self.dimension_bo_runner.update_history_data(dimension=dimension,
+                                                     measurement=measurement)
 
