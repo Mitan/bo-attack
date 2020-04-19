@@ -8,7 +8,7 @@ import numpy as np
 from utilities.Utils import ei_acquizition_function
 
 
-class DimensionBORunner:
+class OuterBORunner:
     def __init__(self, domain_dimensions, bos_iterations, total_iterations_max):
         """
         :type total_iterations_max (int): max number of BO iterations allowed
