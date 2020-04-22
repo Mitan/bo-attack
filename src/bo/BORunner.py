@@ -17,7 +17,6 @@ class BORunner:
         :type domain_dimensions (arraylike):  the list of the dimensions to select from
         """
         # total number of BO evaluations performed so far
-        # todo check if we need it
         self.total_iterations = 0
         self.dimension_bo_runner = DimensionBORunner(domain_dimensions=domain_dimensions)
         # history of inputs
@@ -28,7 +27,7 @@ class BORunner:
         # the current status of the attack
         self.attack_status = False
 
-        # the succesfully found image
+        # the successfully found image
         self.successful_attack_image = None
 
     # initialize GP and BO with a few initial measurements
@@ -46,25 +45,27 @@ class BORunner:
         """
         # todo check if we are already success
         # todo update this using init. or re-write to self.iterations_run
-        total_iterations_run = 0
-        while total_iterations_run < total_iterations_max:
+        while self.total_iterations < total_iterations_max:
             # select the next dimension
             next_dimension = self.select_next_dimension()
 
-            current_bobos_runner = BOBOSRunner(next_dimension)
+            current_bobos_runner = BOBOSRunner(dimension=next_dimension,
+                                               inputs_history=self.inputs_history,
+                                               outputs_history=self.outputs_history)
+
             # the max number of iterations the BO-BOS algorithm can run
-            allowed_iterations = min(total_iterations_max - total_iterations_run, bos_iterations)
+            allowed_iterations = min(total_iterations_max - self.total_iterations, bos_iterations)
 
             # run BO-BOS for this dimension
             current_bobos_runner.run(allowed_iterations)
            
             # add the iterations run by BO-BOS to total
-            total_iterations_run += current_bobos_runner.iterations_run
+            self.total_iterations += current_bobos_runner.iterations_run
 
             # if we found a successful attack, stop
             if current_bobos_runner.attack_status:
                 self.attack_status = True
-                self.successful_attack_image = current_bobos_runner.succesful_attack_image
+                self.successful_attack_image = current_bobos_runner.successful_attack_image
                 break
 
             # if we haven't found the successful attack at this dimension
@@ -74,13 +75,14 @@ class BORunner:
                                                          measurement=current_bobos_runner.best_measurement)
 
             # update the inputs and outputs with the new data obtained from BO-BOS
+            # todo change this
             self.inputs_history = np.append(self.inputs_history, current_bobos_runner.inputs_history, axis=0)
             self.outputs_history = np.append(self.outputs_history, current_bobos_runner.outputs_history)
 
         # check status after running BO
         if self.attack_status:
-            print("Attack succeeded after {} iterations".format(total_iterations_run))
+            print("Attack succeeded after {} iterations".format(self.total_iterations))
         else:
-            print("Attack failed after {} iterations".format(total_iterations_run))
+            print("Attack failed after {} iterations".format(self.total_iterations))
 
 
