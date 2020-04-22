@@ -18,6 +18,8 @@ class DimensionBORunner:
         self.history_dimensions = []
         # list of the measurements of the corresponding dimensions
         self.history_measurements = []
+        # need only to pass bo_iteration to BOS function.
+        self.iterations_run = 0
 
     # initialize GP and BO with a few initial measurements
     def init_bo(self):
@@ -30,7 +32,7 @@ class DimensionBORunner:
 
         # get a GP for the next
         # ker = GPy.kern.RBF(input_dim=1)
-        ker =GPy.kern.Matern52(input_dim=1, variance=1.0, lengthscale=1.0)
+        ker = GPy.kern.Matern52(input_dim=1, variance=1.0, lengthscale=1.0)
 
         m = GPy.models.GPRegression(self.history_dimensions,
                                     self.history_measurements.reshape(num_points, -1),
@@ -46,14 +48,16 @@ class DimensionBORunner:
         for next_x in self.domain_dimensions:
             mu, var = m.predict(np.atleast_2d(next_x))
             # todo how to write it in a better way?
-            std = math.sqrt(var[0,0])
-            mu = mu[0,0]
+            std = math.sqrt(var[0, 0])
+            mu = mu[0, 0]
             ei = ei_acquizition_function(mu=mu,
                                          sigma=std,
                                          best_observation=best_observation)
             if ei > best_val:
                 best_x = next_x
                 best_val = ei
+        # update the number of iterations. Not sure if here is the best place to do it.
+        self.iterations_run += 1
         return best_x
 
     def update_history_data(self, dimension, measurement):
