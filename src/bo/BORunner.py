@@ -57,7 +57,7 @@ class BORunner:
             allowed_iterations = min(total_iterations_max - self.total_iterations, bos_iterations)
 
             # run BO-BOS for this dimension
-            current_bobos_runner.run(allowed_iterations)
+            new_inputs, new_outputs = current_bobos_runner.run(allowed_iterations)
            
             # add the iterations run by BO-BOS to total
             self.total_iterations += current_bobos_runner.iterations_run
@@ -72,12 +72,12 @@ class BORunner:
 
             # update the outer BO loop with the dimension and best found value for it
             self.dimension_bo_runner.update_history_data(dimension=next_dimension,
-                                                         measurement=current_bobos_runner.best_measurement)
+                                                         measurement=current_bobos_runner.best_regret)
 
             # update the inputs and outputs with the new data obtained from BO-BOS
             # todo change this
-            self.inputs_history = np.append(self.inputs_history, current_bobos_runner.inputs_history, axis=0)
-            self.outputs_history = np.append(self.outputs_history, current_bobos_runner.outputs_history)
+            self.inputs_history = np.append(self.inputs_history, new_inputs, axis=0)
+            self.outputs_history = np.append(self.outputs_history, new_outputs)
 
         # check status after running BO
         if self.attack_status:

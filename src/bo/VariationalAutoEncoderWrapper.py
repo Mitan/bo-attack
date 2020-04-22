@@ -19,6 +19,10 @@ class VariationalAutoEncoderWrapper:
     def encode_range(self, inputs):
         return []
 
+    # decode the range of inputs - used to encode the history of BO inputs
+    def decode_range(self, inputs):
+        return []
+
     # encode one input
     def encode(self, input):
         return 0
