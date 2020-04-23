@@ -4,7 +4,7 @@ from dataset_descriptors.MnistDescriptor import MNISTDescriptor
 from vae_models.VAEFactory import VAEFactory
 
 if __name__ == '__main__':
-    latent_dim = 4
+    latent_dim = 10
     mnist_root = '../../datasets/'
 
     dataset_descriptor = MNISTDescriptor()
@@ -20,10 +20,10 @@ if __name__ == '__main__':
     """
     # x = np.atleast_2d([0.1, 0.9, -0.5, 0.7])
 
-    x = np.atleast_2d([[1.0, 1.0, 1.0, 1.0], [-0.2, -0.2, -0.8, -0.8]])
-    print(x.shape)
+    x = np.atleast_2d([np.ones(latent_dim), np.zeros(latent_dim)])
+    # print(x.shape)
     y = vae.decode(x)
-    print(y.shape)
+    # print(y.shape)
 
     x_back = vae.encode(y)
     print(x_back)
