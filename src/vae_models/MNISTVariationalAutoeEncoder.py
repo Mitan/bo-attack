@@ -111,26 +111,19 @@ class MnistVariationalAutoEncoder:
                           format(train_losses[-1], i + 1, total, ep), end='', flush=True)
                 gd.step()
 
-    # encode the range of inputs - used to encode the history of BO inputs
-    def encode_range(self, inputs):
-        return []
-
-    # decode the range of inputs - used to encode the history of BO inputs
-    def decode_range(self, inputs):
-        return []
-
-    # encode one input
-    def encode(self, current_input):
+    # encode input or a batch of inputs
+    # expects a 2D numpy array of shape (n_points * original_dim)
+    def encode(self, inputs):
         with torch.no_grad():
-            transformed_input = torch.tensor(current_input).float().view(-1, self.original_dim)
+            transformed_input = torch.tensor(inputs).float().view(-1, self.original_dim)
             # take only mean
-            x_encoded = self.encoder(transformed_input).numpy().T[:self.latent_dim]
+            x_encoded = self.encoder(transformed_input).numpy().T[:self.latent_dim].T
         return x_encoded
 
-    # decode one input
-    # input is a numpy array
-    def decode(self, current_input):
+    # encode input or a batch of inputs
+    # expects a 2D numpy array of shape (n_points * latent_dim)
+    def decode(self, inputs):
         with torch.no_grad():
-            transformed_input = torch.tensor(current_input).float().view(-1, self.latent_dim)
-            x_decoded = torch.sigmoid(self.decoder(transformed_input)).numpy().T
+            transformed_input = torch.tensor(inputs).float().view(-1, self.latent_dim)
+            x_decoded = torch.sigmoid(self.decoder(transformed_input)).numpy()
         return x_decoded

@@ -40,7 +40,7 @@ class BOBOSRunner:
         # the history of inputs found by BO
 
         # reduce the dimension history of the input using VAE
-        self.history_inputs = self.vae.encode_range(inputs=inputs_history)
+        self.history_inputs = self.vae.encode(inputs=inputs_history)
 
         # the history of outputs found by BO
         self.history_outputs = np.copy(outputs_history)
@@ -105,7 +105,7 @@ class BOBOSRunner:
         # after this BO is finished, return the found inputs and outputs
         inputs_found = self.history_inputs[-self.iterations_run:, :]
         outputs_found = self.history_outputs[-self.iterations_run:]
-        decoded_inputs_found = self.vae.decode_range(inputs_found)
+        decoded_inputs_found = self.vae.decode(inputs_found)
         return decoded_inputs_found, outputs_found
 
     def get_bo_measurement(self):

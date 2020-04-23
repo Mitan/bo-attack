@@ -1,7 +1,7 @@
 import numpy as np
 
 from dataset_descriptors.MnistDescriptor import MNISTDescriptor
-from vae_models.vae_factory import VAEFactory
+from vae_models.VAEFactory import VAEFactory
 
 if __name__ == '__main__':
     latent_dim = 4
@@ -18,7 +18,12 @@ if __name__ == '__main__':
         MNIST(root=mnist_root, train=False, transform=transforms.ToTensor()),
         batch_size=batch_size, shuffle=True, pin_memory=True)   
     """
-    x = np.atleast_2d([0.1, 0.9, -0.5])
+    # x = np.atleast_2d([0.1, 0.9, -0.5, 0.7])
+
+    x = np.atleast_2d([[1.0, 1.0, 1.0, 1.0], [-0.2, -0.2, -0.8, -0.8]])
+    print(x.shape)
     y = vae.decode(x)
+    print(y.shape)
+
     x_back = vae.encode(y)
     print(x_back)
