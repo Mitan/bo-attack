@@ -1,4 +1,4 @@
-'''Example of VAE on MNIST dataset using MLP
+"""Example of VAE on MNIST dataset using MLP
 The VAE has a modular design. The encoder, decoder and VAE
 are 3 models that share weights. After training the VAE model,
 the encoder can be used to generate latent vectors.
@@ -9,8 +9,8 @@ latent vector from a Gaussian distribution with mean = 0 and std = 1.
 "Auto-Encoding Variational Bayes."
 https://arxiv.org/abs/1312.6114
 
-code modified by Dmitrii based on the example in keras
-'''
+code modified by Dmitrii
+"""
 from itertools import chain
 
 import torch
@@ -89,9 +89,9 @@ class MnistVariationalAutoEncoder:
         # Training dataset
         download = dataset_folder is None
         train_loader = torch.utils.data.DataLoader(
-                MNIST(root=dataset_folder, train=True, download=download,
-                      transform=transforms.ToTensor()),
-                batch_size=self.batch_size, shuffle=True, pin_memory=True)
+            MNIST(root=dataset_folder, train=True, download=download,
+                  transform=transforms.ToTensor()),
+            batch_size=self.batch_size, shuffle=True, pin_memory=True)
 
         gd = torch.optim.Adam(
             chain(*[x.parameters() for x in [self.encoder, self.decoder]
@@ -108,5 +108,29 @@ class MnistVariationalAutoEncoder:
                 train_losses.append(loss_value.item())
                 if (i + 1) % 10 == 0:
                     print('\rTrain loss: {}. Batch {} of {} for epoch {}'.
-                          format(train_losses[-1], i+1, total, ep), end='', flush=True)
+                          format(train_losses[-1], i + 1, total, ep), end='', flush=True)
                 gd.step()
+
+    # encode the range of inputs - used to encode the history of BO inputs
+    def encode_range(self, inputs):
+        return []
+
+    # decode the range of inputs - used to encode the history of BO inputs
+    def decode_range(self, inputs):
+        return []
+
+    # encode one input
+    def encode(self, current_input):
+        with torch.no_grad():
+            transformed_input = torch.tensor(current_input).float().view(-1, self.original_dim)
+            # take only mean
+            x_encoded = self.encoder(transformed_input).numpy().T[:self.latent_dim]
+        return x_encoded
+
+    # decode one input
+    # input is a numpy array
+    def decode(self, current_input):
+        with torch.no_grad():
+            transformed_input = torch.tensor(current_input).float().view(-1, self.latent_dim)
+            x_decoded = torch.sigmoid(self.decoder(transformed_input)).numpy().T
+        return x_decoded
