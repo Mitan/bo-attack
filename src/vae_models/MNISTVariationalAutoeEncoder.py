@@ -24,6 +24,7 @@ class MnistVariationalAutoEncoder:
 
     def __init__(self, latent_dim, dataset_descriptor):
         # run some pytorch init code
+
         torch.manual_seed(0)
 
         if torch.cuda.is_available():
@@ -83,11 +84,12 @@ class MnistVariationalAutoEncoder:
         loss = -(px_z.log_prob(x) + pz.log_prob(z) - qz_x.log_prob(z)).mean()
         return loss, decoder_output
 
-    def train_model(self, num_epochs):
+    def train(self, num_epochs, dataset_folder=None):
 
         # Training dataset
+        download = dataset_folder is None
         train_loader = torch.utils.data.DataLoader(
-                MNIST(root='.', train=True, download=True,
+                MNIST(root=dataset_folder, train=True, download=download,
                       transform=transforms.ToTensor()),
                 batch_size=self.batch_size, shuffle=True, pin_memory=True)
 
@@ -96,7 +98,7 @@ class MnistVariationalAutoEncoder:
                     if (isinstance(x, nn.Module) or isinstance(x, nn.Parameter))]),
             lr=self.learning_rate)
         train_losses = []
-        for _ in range(num_epochs):
+        for ep in range(num_epochs):
             for i, (batch, _) in enumerate(train_loader):
                 total = len(train_loader)
                 gd.zero_grad()
@@ -105,6 +107,6 @@ class MnistVariationalAutoEncoder:
                 loss_value.backward()
                 train_losses.append(loss_value.item())
                 if (i + 1) % 10 == 0:
-                    print('\rTrain loss:', train_losses[-1],
-                          'Batch', i + 1, 'of', total, ' ' * 10, end='', flush=True)
+                    print('\rTrain loss: {}. Batch {} of {} for epoch {}'.
+                          format(train_losses[-1], i+1, total, ep), end='', flush=True)
                 gd.step()
