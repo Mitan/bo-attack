@@ -15,3 +15,5 @@ class MNISTDescriptor:
     # todo move it from here
     # epsilon used in Attacking the dataset
     epsilon = 0.3
+
+    dataset_folder = './datasets/'

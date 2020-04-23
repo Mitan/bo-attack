@@ -4,14 +4,15 @@ A class for running BO-BOS with fixed dimension
 
 import numpy as np
 
-from bo.VariationalAutoEncoderWrapper import VariationalAutoEncoderWrapper
 from bo.bos_function import run_BOS
+from vae_models.vae_factory import VAEFactory
 
 
 class BOBOSRunner:
-    def __init__(self, dimension, inputs_history, outputs_history, dimension_bo_iteration, initial_bos_iterations=8):
+    def __init__(self, dataset_descriptor, dimension, inputs_history, outputs_history, dimension_bo_iteration, initial_bos_iterations=8):
         """
 
+        :type dataset_descriptor: the descriptor of the dataset
         :type dimension_bo_iteration: int. The current iteration of BO over dimensions. Needed to pass to BOS function
         :type initial_bos_iterations: int. Number of initial BO-BOS iterations to run without stopping.
         :type inputs_history: arraylike. The history of inputs obtained by the previous iterations of BO on images (
@@ -22,9 +23,11 @@ class BOBOSRunner:
 
         """
         # the reduced dimension of the inputs to perform BO-BOS
+        self.dataset_descriptor = dataset_descriptor
         self.dimension = dimension
 
-        self.vae = VariationalAutoEncoderWrapper(self.dimension)
+        self.vae = VAEFactory.get_vae(dataset_descriptor=self.dataset_descriptor,
+                                      latent_dimension=self.dimension)
         # train the VAE
         self.vae.train()
 
