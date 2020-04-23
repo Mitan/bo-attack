@@ -23,6 +23,7 @@ class DimensionBORunner:
 
     # initialize GP and BO with a few initial measurements
     def init_bo(self):
+        # todo init GP here and re-learn hypers not every time, but if number of inputs is divisible by certain const
         raise NotImplemented
 
     # select the next dimension using EI
