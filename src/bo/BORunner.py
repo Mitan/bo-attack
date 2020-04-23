@@ -35,8 +35,8 @@ class BORunner:
         raise NotImplemented
 
     # select the next dimension using EI
-    def select_next_dimension(self):
-        return self.dimension_bo_runner.select_next_dimension()
+    def select_next_dimension(self, bos_iterations):
+        return self.dimension_bo_runner.select_next_dimension(iterations_run=self.total_iterations + bos_iterations)
 
     def run(self, bos_iterations, total_iterations_max):
         """
@@ -47,7 +47,7 @@ class BORunner:
         # todo update this using init. or re-write to self.iterations_run
         while self.total_iterations < total_iterations_max:
             # select the next dimension
-            next_dimension = self.select_next_dimension()
+            next_dimension = self.select_next_dimension(bos_iterations=bos_iterations)
 
             current_bobos_runner = BOBOSRunner(dimension=next_dimension,
                                                inputs_history=self.inputs_history,
@@ -72,6 +72,7 @@ class BORunner:
 
             # update the outer BO loop with the dimension and best found value for it
             self.dimension_bo_runner.update_history_data(dimension=next_dimension,
+                                                         iterations_run=self.total_iterations,
                                                          measurement=current_bobos_runner.best_regret)
 
             # update the inputs and outputs with the new data obtained from BO-BOS
