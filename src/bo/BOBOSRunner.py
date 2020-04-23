@@ -25,6 +25,8 @@ class BOBOSRunner:
         self.dimension = dimension
 
         self.vae = VariationalAutoEncoderWrapper(self.dimension)
+        # train the VAE
+        self.vae.train()
 
         # the current status of the attack
         self.attack_status = False

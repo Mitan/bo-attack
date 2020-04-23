@@ -1,7 +1,10 @@
 # class for storing the parameters of the MNIST dataset
+from enums.DatasetEnum import DatasetEnum
 
 
 class MNISTDescriptor:
+
+    dataset_type = DatasetEnum.MNIST
     # image 2D dimension
     dim = 784
     channels = 1

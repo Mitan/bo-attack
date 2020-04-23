@@ -3,13 +3,13 @@ A class for a wrapper for VAE
 """
 
 
-class VariationalAutoEncoderWrapper:
+class AbstractVariationalAutoEncoderWrapper:
 
     def __init__(self, dimension):
         """
         :type dimension: int. The dimension of VAE
         """
-        self.dimension = dimension
+        pass
 
     # train the VAE
     def train(self, num_epochs=50):
