@@ -35,10 +35,10 @@ class MnistLoader:
         self.test_data = self._extract_inputs(f"{data_path}/t10k-images-idx3-ubyte.gz", 10000)
         self.test_labels = self._extract_labels(f"{data_path}/t10k-labels-idx1-ubyte.gz", 10000)
 
-        self.validation_data = train_data[:self.VALIDATION_SIZE, :, :, :]
+        self.validation_data = train_data[:self.VALIDATION_SIZE, :]
         self.validation_labels = train_labels[:self.VALIDATION_SIZE]
 
-        self.train_data = train_data[self.VALIDATION_SIZE:, :, :, :]
+        self.train_data = train_data[self.VALIDATION_SIZE:, :]
         self.train_labels = train_labels[self.VALIDATION_SIZE:]
 
     @staticmethod
@@ -59,7 +59,7 @@ class MnistLoader:
             data = np.frombuffer(buf, dtype=np.uint8).astype(np.float32)
             # todo note this way of normalisation
             data = (data / 255) - 0.5
-            data = data.reshape(num_images, 28, 28, 1)
+            data = data.reshape(num_images, -1)
             return data
 
     @staticmethod

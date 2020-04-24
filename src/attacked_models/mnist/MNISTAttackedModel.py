@@ -1,6 +1,14 @@
+"""
+This code is modified by Dmitrii from the original code by Nicholas Carlini <nicholas@carlini.com>.
+"""
+
 from tensorflow.contrib.keras.api.keras.layers import Conv2D, MaxPooling2D
 from tensorflow.contrib.keras.api.keras.layers import Dense, Activation, Flatten
 from tensorflow.contrib.keras.api.keras.models import Sequential
+
+import keras.backend as K
+# from keras.models import Sequential
+# from keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense
 
 
 class MNISTAttackedModel:
@@ -38,6 +46,6 @@ class MNISTAttackedModel:
 
         self.model = model
 
+    # the input point should be a np array and have dimensions (num_points x 784)
     def predict(self, data):
-        # data = data.reshape(28,28,1)
-        return self.model(data.reshape(28,28,1))
+        return K.eval(self.model(data.reshape(-1, 28,28,1)))

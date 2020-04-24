@@ -3,7 +3,6 @@ import numpy as np
 from attacked_models.AttackedModelFactory import AttackedModelFactory
 from dataset_data.mnist.MnistDescriptor import MNISTDescriptor
 from dataset_data.mnist.MnistLoader import MnistLoader
-from vae_models.VAEFactory import VAEFactory
 
 if __name__ == '__main__':
     latent_dim = 10
@@ -18,11 +17,19 @@ if __name__ == '__main__':
     # y = vae.decode(x)
     # print(y.shape)
 
-    dataset_descriptor.attacked_model_path = '../src/attacked_models/mnist/mnist'
     mnist_loader = MnistLoader()
     dataset_descriptor.dataset_folder = '../../datasets/'
     mnist_loader.load_data(dataset_folder=dataset_descriptor.dataset_folder)
+    # print(mnist_loader.test_data.shape)
 
-    # attacked_model = AttackedModelFactory.get_attacked_model(dataset_descriptor)
-    # predictions = attacked_model.predict(y)
-    # print(predictions)
+    test_images = mnist_loader.test_data
+
+    dataset_descriptor.attacked_model_path = '../attacked_models/mnist/mnist'
+    attacked_model = AttackedModelFactory.get_attacked_model(dataset_descriptor)
+
+    predictions = attacked_model.predict(test_images)
+
+    predcited_classes = predictions.argmax(axis=1)
+    correct_classes = mnist_loader.test_labels[:, :].argmax(axis=1)
+    # print(mnist_loader.test_labels[:, :].argmax(axis=1))
+    print("accuracy is {}".format(np.mean(correct_classes == predcited_classes)))
