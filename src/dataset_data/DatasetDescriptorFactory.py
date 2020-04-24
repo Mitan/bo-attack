@@ -1,5 +1,5 @@
-from dataset_descriptors.CifarDescriptor import CIFARDescriptor
-from dataset_descriptors.MnistDescriptor import MNISTDescriptor
+from dataset_data.cifar.CifarDescriptor import CIFARDescriptor
+from dataset_data.mnist.MnistDescriptor import MNISTDescriptor
 from enums.DatasetEnum import DatasetEnum
 
 
