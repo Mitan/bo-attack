@@ -17,3 +17,5 @@ class MNISTDescriptor:
     epsilon = 0.3
 
     dataset_folder = './datasets/'
+
+    attacked_model_path = './src/attacked_models/mnist/mnist'
