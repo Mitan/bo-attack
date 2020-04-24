@@ -8,7 +8,7 @@ from bo.BOSFunction import run_BOS
 from vae_models.VAEFactory import VAEFactory
 
 
-class BOBOSRunner:
+class FixedDimensionRunner:
     def __init__(self, dataset_descriptor, dimension, inputs_history, outputs_history, dimension_bo_iteration, initial_bos_iterations=8):
         """
 

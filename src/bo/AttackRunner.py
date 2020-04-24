@@ -1,9 +1,10 @@
 """
 A class for runner the outer BO loop on dimensions
 """
-from bo.BOBOSRunner import BOBOSRunner
+from bo.FixedDimensionRunner import FixedDimensionRunner
 from bo.DimensionBORunner import DimensionBORunner
 import numpy as np
+
 
 # the paper uses 30 initial evaluations
 # 900 max iterations
@@ -11,7 +12,7 @@ import numpy as np
 # learning the dimension with frequency 8 * update_for_hypers, i.e. 8 * 5
 
 
-class BORunner:
+class AttackRunner:
     def __init__(self, domain_dimensions):
         """
         :type domain_dimensions (arraylike):  the list of the dimensions to select from
@@ -49,16 +50,16 @@ class BORunner:
             # select the next dimension
             next_dimension = self.select_next_dimension(bos_iterations=bos_iterations)
 
-            current_bobos_runner = BOBOSRunner(dimension=next_dimension,
-                                               inputs_history=self.inputs_history,
-                                               outputs_history=self.outputs_history)
+            current_bobos_runner = FixedDimensionRunner(dimension=next_dimension,
+                                                        inputs_history=self.inputs_history,
+                                                        outputs_history=self.outputs_history)
 
             # the max number of iterations the BO-BOS algorithm can run
             allowed_iterations = min(total_iterations_max - self.total_iterations, bos_iterations)
 
             # run BO-BOS for this dimension
             new_inputs, new_outputs = current_bobos_runner.run(allowed_iterations)
-           
+
             # add the iterations run by BO-BOS to total
             self.total_iterations += current_bobos_runner.iterations_run
 
@@ -85,5 +86,3 @@ class BORunner:
             print("Attack succeeded after {} iterations".format(self.total_iterations))
         else:
             print("Attack failed after {} iterations".format(self.total_iterations))
-
-
