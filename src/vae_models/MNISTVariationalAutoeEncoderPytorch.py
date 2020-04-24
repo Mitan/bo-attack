@@ -20,7 +20,7 @@ from torchvision import transforms
 from torchvision.datasets import MNIST
 
 
-class MnistVariationalAutoEncoder:
+class MnistVariationalAutoEncoderPytorch:
 
     def __init__(self, latent_dim, dataset_descriptor):
         # run some pytorch init code
