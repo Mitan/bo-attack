@@ -57,8 +57,9 @@ class MnistLoader:
             bytestream.read(16)
             buf = bytestream.read(num_images * 28 * 28)
             data = np.frombuffer(buf, dtype=np.uint8).astype(np.float32)
-            # todo note this way of normalisation
-            data = (data / 255) - 0.5
+            # todo note this way of normalisation: see MNISTAttackedModel.predict for details
+            # data = (data / 255) - 0.5
+            data = (data / 255)
             data = data.reshape(num_images, -1)
             return data
 

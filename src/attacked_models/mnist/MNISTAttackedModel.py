@@ -49,4 +49,12 @@ class MNISTAttackedModel:
 
     # the input point should be a np array and have dimensions (num_points x 784)
     def predict(self, data):
+        """
+        the original code by Nicholas Carlini assumed MNIST normalisation to be x-> x/255 - 0.5.
+        But in this case there are some instabilities in training the VAE with this normalisation
+        So here we assume the normalisation x -> x/255,
+        and then subtract 0.5 here to match the normalisation from Nicholas Carlini
+
+        """
+        data -= 0.5
         return K.eval(self.model(data.reshape(-1, 28,28,1)))
