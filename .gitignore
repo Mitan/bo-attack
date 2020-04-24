@@ -168,6 +168,7 @@ cifar
 src/exp_results
 README.md
 tests
-!/src/attacked_models/mnist/
 datasets
-mnist
+src/attacked_models/mnist/mnist
+
+src/objective_func/tf_models/models/
