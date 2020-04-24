@@ -22,14 +22,18 @@ if __name__ == '__main__':
     mnist_loader.load_data(dataset_folder=dataset_descriptor.dataset_folder)
     # print(mnist_loader.test_data.shape)
 
-    test_images = mnist_loader.test_data
+    num_points = 10000
+    # num_points = 3
+
+    test_images = mnist_loader.test_data[:num_points, :]
 
     dataset_descriptor.attacked_model_path = '../attacked_models/mnist/mnist'
     attacked_model = AttackedModelFactory.get_attacked_model(dataset_descriptor)
 
     predictions = attacked_model.predict(test_images)
+    print(predictions.sum(axis=1))
 
     predcited_classes = predictions.argmax(axis=1)
-    correct_classes = mnist_loader.test_labels[:, :].argmax(axis=1)
+    correct_classes = mnist_loader.test_labels[:num_points, :].argmax(axis=1)
     # print(mnist_loader.test_labels[:, :].argmax(axis=1))
     print("accuracy is {}".format(np.mean(correct_classes == predcited_classes)))
