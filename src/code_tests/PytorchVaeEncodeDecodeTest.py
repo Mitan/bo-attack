@@ -1,6 +1,6 @@
 import numpy as np
 
-from dataset_descriptors.MnistDescriptor import MNISTDescriptor
+from dataset_data.mnist.MnistDescriptor import MNISTDescriptor
 from vae_models.VAEFactory import VAEFactory
 
 if __name__ == '__main__':

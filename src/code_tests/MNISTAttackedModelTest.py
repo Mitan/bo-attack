@@ -1,7 +1,7 @@
 import numpy as np
 
 from attacked_models.AttackedModelFactory import AttackedModelFactory
-from dataset_descriptors.MnistDescriptor import MNISTDescriptor
+from dataset_data.mnist.MnistDescriptor import MNISTDescriptor
 from vae_models.VAEFactory import VAEFactory
 
 if __name__ == '__main__':

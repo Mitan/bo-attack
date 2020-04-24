@@ -1,4 +1,4 @@
-from bo.BORunner import BORunner
+from bo.AttackRunner import AttackRunner
 import numpy as np
 
 if __name__ == '__main__':
@@ -7,7 +7,7 @@ if __name__ == '__main__':
     # Y = np.sin(X)
     Y = np.sin(X) + np.random.randn(num_points, 1) * 0.05
 
-    bo_runner = BORunner(domain_dimensions=X)
+    bo_runner = AttackRunner(domain_dimensions=X)
     init_points = 5
     init_history = np.hstack([X[:init_points, :], np.zeros((init_points, 1))])
     bo_runner.dimension_bo_runner.history_dimensions_iterations = init_history

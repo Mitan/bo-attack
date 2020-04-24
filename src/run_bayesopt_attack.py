@@ -6,7 +6,7 @@ import pickle
 
 import numpy as np
 
-from dataset_descriptors.DatasetDescriptionFactory import DatasetDescriptionFactory
+from dataset_data.DatasetDescriptionFactory import DatasetDescriptionFactory
 from enums.AcquisitionEnum import AcquisitionEnum
 from enums.DatasetEnum import DatasetEnum
 from enums.GPEnum import GPEnum

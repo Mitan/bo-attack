@@ -4,8 +4,8 @@ import torch
 from torchvision import transforms
 from torchvision.datasets import MNIST
 
-from dataset_descriptors.MnistDescriptor import MNISTDescriptor
-from vae_models.vae_factory import VAEFactory
+from dataset_data.mnist.MnistDescriptor import MNISTDescriptor
+from vae_models.VAEFactory import VAEFactory
 
 
 def plot_results(vae,
