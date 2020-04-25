@@ -89,8 +89,8 @@ if __name__ == '__main__':
     mnist_root = '../../datasets/'
 
     dataset_descriptor = MNISTDescriptor()
-    vae = MnistVariationalAutoEncoderPytorch(latent_dim=latent_dim, dataset_descriptor=dataset_descriptor)
-    vae.train(num_epochs=15, dataset_folder=mnist_root)
+    vae = VAEFactory.get_vae(latent_dimension=latent_dim, dataset_descriptor=dataset_descriptor)
+    vae.train(num_epochs=50, dataset_folder=mnist_root)
 
     batch_size = vae.batch_size
     test_loader = torch.utils.data.DataLoader(
@@ -106,9 +106,8 @@ if __name__ == '__main__':
     batch = batch[: num_points, :, :].view(-1, vae.original_dim).to(vae.device)
     original_inputs = batch.numpy()
 
-    with torch.no_grad():
-        z_mean = vae.encoder(batch)[:, :latent_dim]
-        transformed_inputs = torch.sigmoid(vae.decoder(z_mean)).numpy()
+    encoded_x = vae.encode(original_inputs)
+    transformed_inputs =  vae.decode(encoded_x)
 
     plot(num_figures=num_points,
          original_figures=original_inputs.reshape(-1, 28),

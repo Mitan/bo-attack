@@ -1,5 +1,5 @@
 from enums.DatasetEnum import DatasetEnum
-from vae_models.MNISTVariationalAutoeEncoderKeras import MnistVariationalAutoEncoderKeras
+from vae_models.MNISTVariationalAutoeEncoderPytorch import MnistVariationalAutoEncoderPytorch
 
 
 class VAEFactory:
@@ -9,8 +9,8 @@ class VAEFactory:
     @staticmethod
     def get_vae(dataset_descriptor, latent_dimension):
         if dataset_descriptor.dataset_type == DatasetEnum.MNIST:
-            vae = MnistVariationalAutoEncoderKeras(dataset_descriptor=dataset_descriptor,
-                                                   latent_dim=latent_dimension)
+            vae = MnistVariationalAutoEncoderPytorch(dataset_descriptor=dataset_descriptor,
+                                                     latent_dim=latent_dimension)
         else:
             raise NotImplementedError
         return vae
