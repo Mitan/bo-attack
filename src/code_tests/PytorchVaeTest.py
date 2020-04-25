@@ -85,7 +85,7 @@ def plot(num_figures, original_figures, transformed_figures):
 
 
 if __name__ == '__main__':
-    latent_dim = 32
+    latent_dim = 100
     mnist_root = '../../datasets/'
 
     dataset_descriptor = MNISTDescriptor()

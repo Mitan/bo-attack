@@ -51,8 +51,8 @@ class AttackRunner:
             next_dimension = self.select_next_dimension(bos_iterations=bos_iterations)
 
             current_bobos_runner = FixedDimensionRunner(dimension=next_dimension,
-                                                        inputs_history=self.inputs_history,
-                                                        outputs_history=self.outputs_history)
+                                                        initial_history_inputs=self.inputs_history,
+                                                        initial_history_outputs=self.outputs_history)
 
             # the max number of iterations the BO-BOS algorithm can run
             allowed_iterations = min(total_iterations_max - self.total_iterations, bos_iterations)
@@ -74,7 +74,7 @@ class AttackRunner:
             # update the outer BO loop with the dimension and best found value for it
             self.dimension_bo_runner.update_history_data(dimension=next_dimension,
                                                          iterations_run=self.total_iterations,
-                                                         measurement=current_bobos_runner.best_regret)
+                                                         measurement=current_bobos_runner.best_output)
 
             # update the inputs and outputs with the new data obtained from BO-BOS
             # todo change this
