@@ -127,6 +127,9 @@ class FixedDimensionRunner:
         return 0
 
     def update_history_data(self, new_input, new_output):
+        # update the image BO runner with the new encoded image and the output
         self.image_bo_runner.update_history_data(new_input=new_input, new_output=new_output)
+        # update the best output for dimension BO
         self.best_output = min(self.best_output, new_output)
+        # update the history of best outputs for performing BO
         self.history_best_outputs.append(self.best_output)
