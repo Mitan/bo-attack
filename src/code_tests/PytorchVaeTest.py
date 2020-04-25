@@ -4,7 +4,9 @@ import torch
 from torchvision import transforms
 from torchvision.datasets import MNIST
 
+from attacked_models.AttackedModelFactory import AttackedModelFactory
 from dataset_data.mnist.MnistDescriptor import MNISTDescriptor
+from vae_models.MNISTVariationalAutoeEncoderPytorch import MnistVariationalAutoEncoderPytorch
 from vae_models.VAEFactory import VAEFactory
 
 
@@ -23,6 +25,7 @@ def plot_results(vae,
     decoder = vae.decoder
     with torch.no_grad():
         batch = (test_loader.dataset.data.float() / 255.)
+        print(batch.numpy().shape)
         batch = batch.view(-1, vae.original_dim).to(vae.device)
         z_mean = encoder(batch)[:, :latent_dim]
         y_test = test_loader.dataset.targets
@@ -69,20 +72,55 @@ def plot_results(vae,
     plt.show()
 
 
+def plot(num_figures, original_figures, transformed_figures):
+    digit_size = 28
+    figure = np.zeros((digit_size * num_figures, digit_size * 3))
+    figure[:, :digit_size] = original_figures
+    figure[:, digit_size: 2 * digit_size] = transformed_figures
+    figure[:, 2 * digit_size: ] = transformed_figures - original_figures
+
+    plt.imshow(figure, cmap='Greys_r')
+    # plt.savefig(filename)
+    plt.show()
+
+
 if __name__ == '__main__':
-    latent_dim = 2
+    latent_dim = 32
     mnist_root = '../../datasets/'
 
     dataset_descriptor = MNISTDescriptor()
-    vae = VAEFactory.get_vae(dataset_descriptor=dataset_descriptor,
-                             latent_dimension=latent_dim)
-    vae.train(num_epochs=3, dataset_folder=mnist_root)
+    vae = MnistVariationalAutoEncoderPytorch(latent_dim=latent_dim, dataset_descriptor=dataset_descriptor)
+    vae.train(num_epochs=15, dataset_folder=mnist_root)
 
     batch_size = vae.batch_size
     test_loader = torch.utils.data.DataLoader(
         MNIST(root=mnist_root, train=False, transform=transforms.ToTensor()),
         batch_size=batch_size, shuffle=True, pin_memory=True)
 
-    plot_results(vae=vae,
-                 test_loader=test_loader,
-                 model_name="vae_mnist_pytorch")
+    # plot_results(vae=vae,
+    #              test_loader=test_loader,
+    #              model_name="vae_mnist_pytorch")
+    num_points = 10
+    batch = (test_loader.dataset.data.float() / 255.)
+
+    batch = batch[: num_points, :, :].view(-1, vae.original_dim).to(vae.device)
+    original_inputs = batch.numpy()
+
+    with torch.no_grad():
+        z_mean = vae.encoder(batch)[:, :latent_dim]
+        transformed_inputs = torch.sigmoid(vae.decoder(z_mean)).numpy()
+
+    plot(num_figures=num_points,
+         original_figures=original_inputs.reshape(-1, 28),
+         transformed_figures=transformed_inputs.reshape(-1, 28))
+
+    dataset_descriptor.attacked_model_path = '../attacked_models/mnist/mnist'
+    attacked_model = AttackedModelFactory.get_attacked_model(dataset_descriptor)
+
+    original_prediction = attacked_model.predict(original_inputs)
+    original_predcited_classes = original_prediction.argmax(axis=1)
+
+    transformed_prediction = attacked_model.predict(transformed_inputs)
+    transformed_predcited_classes = transformed_prediction.argmax(axis=1)
+    print(original_predcited_classes)
+    print(transformed_predcited_classes)
