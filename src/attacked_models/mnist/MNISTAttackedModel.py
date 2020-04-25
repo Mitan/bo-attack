@@ -13,7 +13,7 @@ import keras.backend as K
 
 class MNISTAttackedModel:
     # note we are using softmax to get bounds [-1, 1] bounds for the BO objective function
-    def __init__(self, weight_load_path=None, use_softmax=True):
+    def __init__(self,  use_softmax, weight_load_path=None):
         self.num_channels = 1
         self.image_size = 28
         self.num_labels = 10

@@ -11,6 +11,7 @@ from vae_models.VAEFactory import VAEFactory
 
 class FixedDimensionRunner:
     def __init__(self,
+                 objective_function_evaluator,
                  dataset_descriptor,
                  dimension,
                  initial_history_inputs,
@@ -19,6 +20,7 @@ class FixedDimensionRunner:
                  initial_bos_iterations=8):
         """
 
+        :type objective_function_evaluator: evaluator of the objective function (the score of the perturbed image).
         :type dataset_descriptor: the descriptor of the dataset
         :type dimension_bo_iteration: int. The current iteration of BO over dimensions. Needed to pass to BOS function
         :type initial_bos_iterations: int. Number of initial BO-BOS iterations to run without stopping.
@@ -29,8 +31,11 @@ class FixedDimensionRunner:
         :type dimension: int. The dimension of the inputs to perform BO-BOS
 
         """
-        # the reduced dimension of the inputs to perform BO-BOS
+        # the evaluator of the objective function
+        self.objective_function_evaluator = objective_function_evaluator
+        # the dataset descriptor
         self.dataset_descriptor = dataset_descriptor
+        # the reduced dimension of the inputs to perform BO-BOS
         self.dimension = dimension
 
         self.vae = VAEFactory.get_vae(dataset_descriptor=self.dataset_descriptor,
@@ -51,11 +56,11 @@ class FixedDimensionRunner:
         self.image_bo_runner = ImageBORunner(initial_history_inputs=encoded_initial_history_inputs,
                                              initial_history_outputs=initial_history_outputs)
 
-        # the best found measurement found by the BO procedure. Needed for the BO on dimensions
-        self.best_output = np.min(initial_history_outputs)
+        # the max found measurement found by the BO procedure. Needed for the BO on dimensions
+        self.best_output = np.max(initial_history_outputs)
 
         # the history of best outputs found so far needed to take the decision by BO-BOS
-        self.history_best_outputs = [self.best_output]
+        self.history_best_outputs = np.array(self.best_output)
 
         # the numbers od iterations run by BO
         self.iterations_run = 0
@@ -87,7 +92,7 @@ class FixedDimensionRunner:
             self.update_history_data(new_input=new_input, new_output=new_output)
 
             # if we found a successful attack, return
-            if new_output < 0:
+            if new_output > 0:
                 self.attack_status = True
                 # pass the obtained input through the decoder to get the actual image
                 self.successful_attack_image = self.vae.decode(new_input)
@@ -96,8 +101,9 @@ class FixedDimensionRunner:
             # if we haven't found a successful attack, check if we want to run more iterations using BOS
             # but only if i is larger than initial number of iterations
             if i == self.initial_bos_iterations - 1:
-                action_regions, grid_st = run_BOS(init_curve=self.history_best_outputs,
-                                                  incumbent=self.best_output,
+                # BOS implementation requires the learning curves to decrease, so invert them
+                action_regions, grid_st = run_BOS(init_curve=self.Y_BOUNDS[1] - self.history_best_outputs,
+                                                  incumbent=self.Y_BOUNDS[1] - self.best_output,
                                                   training_epochs=iterations,
                                                   bo_iteration=self.dimension_bo_iteration,
                                                   y_bounds=self.Y_BOUNDS,
@@ -105,7 +111,8 @@ class FixedDimensionRunner:
 
             # start using the decision rules obtained from BOS
             if i >= self.initial_bos_iterations - 1:
-                state = np.mean(self.history_best_outputs)
+                # BOS implementation requires the learning curves to decrease, so invert them
+                state = self.Y_BOUNDS[1] - np.mean(self.history_best_outputs)
                 ind_state = np.max(np.nonzero(state > grid_st)[0])
                 action_to_take = action_regions[i, ind_state]
 
@@ -123,13 +130,15 @@ class FixedDimensionRunner:
         decoded_inputs_found = self.vae.decode(inputs_found)
         return decoded_inputs_found, outputs_found
 
+    # evaluate the currently found input perturbation
     def get_bo_measurement(self, new_input):
-        return 0
+        decoded_new_input = self.vae.decode(new_input)
+        return self.objective_function_evaluator.evaluate(decoded_new_input)
 
     def update_history_data(self, new_input, new_output):
         # update the image BO runner with the new encoded image and the output
         self.image_bo_runner.update_history_data(new_input=new_input, new_output=new_output)
         # update the best output for dimension BO
-        self.best_output = min(self.best_output, new_output)
-        # update the history of best outputs for performing BO
-        self.history_best_outputs.append(self.best_output)
+        self.best_output = max(self.best_output, new_output)
+        # update the history of best outputs for performing BOS
+        self.history_best_outputs = self.history_best_outputs.append(self.best_output)

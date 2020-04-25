@@ -13,10 +13,14 @@ import numpy as np
 
 
 class AttackRunner:
-    def __init__(self, domain_dimensions):
+    def __init__(self, domain_dimensions, dataset_descriptor, objective_function_evaluator):
         """
-        :type domain_dimensions (arraylike):  the list of the dimensions to select from
+        :type objective_function_evaluator: evaluator of the objective function (the score of the perturbed image).
+        :type dataset_descriptor: the descriptor of the dataset.
+        :type domain_dimensions (arraylike):  the list of the dimensions to select from.
         """
+        self.objective_function_evaluator = objective_function_evaluator
+        self.dataset_descriptor = dataset_descriptor
         # total number of BO evaluations performed so far
         self.total_iterations = 0
         self.dimension_bo_runner = DimensionBORunner(domain_dimensions=domain_dimensions)
@@ -50,23 +54,26 @@ class AttackRunner:
             # select the next dimension
             next_dimension = self.select_next_dimension(bos_iterations=bos_iterations)
 
-            current_bobos_runner = FixedDimensionRunner(dimension=next_dimension,
-                                                        initial_history_inputs=self.inputs_history,
-                                                        initial_history_outputs=self.outputs_history)
+            fixed_dim_runner = FixedDimensionRunner(objective_function_evaluator=self.objective_function_evaluator,
+                                                    dataset_descriptor=self.dataset_descriptor,
+                                                    dimension_bo_iteration=self.dimension_bo_runner.iterations_run,
+                                                    dimension=next_dimension,
+                                                    initial_history_inputs=self.inputs_history,
+                                                    initial_history_outputs=self.outputs_history),
 
             # the max number of iterations the BO-BOS algorithm can run
             allowed_iterations = min(total_iterations_max - self.total_iterations, bos_iterations)
 
             # run BO-BOS for this dimension
-            new_inputs, new_outputs = current_bobos_runner.run(allowed_iterations)
+            new_inputs, new_outputs = fixed_dim_runner.run(allowed_iterations)
 
             # add the iterations run by BO-BOS to total
-            self.total_iterations += current_bobos_runner.iterations_run
+            self.total_iterations += fixed_dim_runner.iterations_run
 
             # if we found a successful attack, stop
-            if current_bobos_runner.attack_status:
+            if fixed_dim_runner.attack_status:
                 self.attack_status = True
-                self.successful_attack_image = current_bobos_runner.successful_attack_image
+                self.successful_attack_image = fixed_dim_runner.successful_attack_image
                 break
 
             # if we haven't found the successful attack at this dimension
@@ -74,7 +81,7 @@ class AttackRunner:
             # update the outer BO loop with the dimension and best found value for it
             self.dimension_bo_runner.update_history_data(dimension=next_dimension,
                                                          iterations_run=self.total_iterations,
-                                                         measurement=current_bobos_runner.best_output)
+                                                         measurement=fixed_dim_runner.best_output)
 
             # update the inputs and outputs with the new data obtained from BO-BOS
             # todo change this
