@@ -4,7 +4,7 @@ import GPy
 import numpy as np
 
 from src.utilities.utilities import subset_select, subset_select_for_learning
-from .base import BaseModel
+from src.gp.gp_models.BaseModel import BaseModel
 
 
 def split(a, n):

@@ -5,7 +5,7 @@ import GPy
 import numpy as np
 
 from src.utilities.utilities import subset_select
-from .base import BaseModel
+from src.gp.gp_models.BaseModel import BaseModel
 
 
 class GPModel(BaseModel):
