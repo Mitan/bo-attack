@@ -1,5 +1,7 @@
 # class for storing the parameters of the MNIST dataset
+from enums.AcquisitionEnum import AcquisitionEnum
 from enums.DatasetEnum import DatasetEnum
+from enums.GPEnum import GPEnum
 
 
 class MNISTDescriptor:
@@ -20,5 +22,15 @@ class MNISTDescriptor:
 
     attacked_model_path = './src/attacked_models/mnist/mnist'
 
+    # todo move to a separate BO descriptor class
     # the bound for the image pixels after rescaling from [0, 255] range
     image_bounds = [0,1]
+
+    acq_type = AcquisitionEnum.EI
+
+    num_subspace = 12
+
+    # the bound on summary statistic for BOS
+    y_bounds_bos = [-1, 1]
+
+    gp_type = GPEnum.AdditiveGP

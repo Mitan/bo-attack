@@ -85,21 +85,22 @@ def plot(num_figures, original_figures, transformed_figures):
 
 
 if __name__ == '__main__':
-    latent_dim = 100
+    latent_dim = 2
     mnist_root = '../../datasets/'
 
     dataset_descriptor = MNISTDescriptor()
     vae = VAEFactory.get_vae(latent_dimension=latent_dim, dataset_descriptor=dataset_descriptor)
-    vae.train(num_epochs=50, dataset_folder=mnist_root)
+    vae.train(num_epochs=15, dataset_folder=mnist_root)
 
     batch_size = vae.batch_size
     test_loader = torch.utils.data.DataLoader(
         MNIST(root=mnist_root, train=False, transform=transforms.ToTensor()),
         batch_size=batch_size, shuffle=True, pin_memory=True)
 
-    # plot_results(vae=vae,
-    #              test_loader=test_loader,
-    #              model_name="vae_mnist_pytorch")
+    plot_results(vae=vae,
+                 test_loader=test_loader,
+                 model_name="vae_mnist_pytorch")
+    """
     num_points = 10
     batch = (test_loader.dataset.data.float() / 255.)
 
@@ -123,3 +124,4 @@ if __name__ == '__main__':
     transformed_predcited_classes = transformed_prediction.argmax(axis=1)
     print(original_predcited_classes)
     print(transformed_predcited_classes)
+    """

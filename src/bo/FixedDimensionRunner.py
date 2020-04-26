@@ -53,7 +53,8 @@ class FixedDimensionRunner:
         encoded_initial_history_inputs = self.vae.encode(inputs=initial_history_inputs)
 
         # the class doing BO on images
-        self.image_bo_runner = ImageBORunner(initial_history_inputs=encoded_initial_history_inputs,
+        self.image_bo_runner = ImageBORunner(dataset_descriptor=dataset_descriptor,
+                                             initial_history_inputs=encoded_initial_history_inputs,
                                              initial_history_outputs=initial_history_outputs)
 
         # the min found measurement found by the BO procedure. Needed for the BO on dimensions
@@ -72,7 +73,7 @@ class FixedDimensionRunner:
         self.BOS_GRID_SIZE = 100
         # todo
         # the bound on summary statistic for BOS
-        self.Y_BOUNDS = [-1, 1]
+        self.Y_BOUNDS = dataset_descriptor.y_bounds_bos
 
         # The current iteration of BO over dimensions. Needed to pass to BOS function
         self.dimension_bo_iteration = dimension_bo_iteration

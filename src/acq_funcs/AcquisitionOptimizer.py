@@ -7,7 +7,7 @@ import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
 
 
-class AcqOptimizer(object):
+class AcqOptimizer:
 
     def __init__(self, acq_type, bounds, gp_model, nsubspace=1):
         """
@@ -33,19 +33,19 @@ class AcqOptimizer(object):
         """
         gp_type = self.gp_model.gp_type
         if gp_type == GPEnum.SimpleGP:
-            new_x, acq_value = self._optimise_acqu_func(acqu_func=self.acq_func,
-                                                        bounds=self.bounds,
-                                                        X_ob=X)
+            new_x, _ = self._optimise_acqu_func(acqu_func=self.acq_func,
+                                                bounds=self.bounds,
+                                                X_ob=X)
 
         elif gp_type == GPEnum.AdditiveGP:
-            new_x, acq_value = self._optimise_acqu_func_additive(acqu_func=self.acq_func,
-                                                                 bounds=self.bounds,
-                                                                 X_ob=X,
-                                                                 nsubspace=self.nsubspace)
+            new_x, _ = self._optimise_acqu_func_additive(acqu_func=self.acq_func,
+                                                         bounds=self.bounds,
+                                                         X_ob=X,
+                                                         nsubspace=self.nsubspace)
         else:
             raise NotImplementedError
 
-        return new_x, acq_value
+        return new_x
 
     @staticmethod
     # this part is taken from the code of Robin Ru
@@ -108,7 +108,7 @@ class AcqOptimizer(object):
     @staticmethod
     # this part is taken from the code of Robin Ru
     def _optimise_acqu_func_additive(acqu_func, bounds, X_ob, func_gradient=True, gridSize=5000, n_start=1,
-                                    nsubspace=12):
+                                     nsubspace=12):
         """
         Optimise acquisition function built on ADDGP model
 
