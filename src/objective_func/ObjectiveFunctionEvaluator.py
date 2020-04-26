@@ -36,8 +36,8 @@ class ObjectiveFunctionEvaluator:
 
         return perturbed_image
 
-    # We want to maximize the objective function to misclassify the image.
-    # If the objective function is larger than zero, the attack is successful
+    # We want to minimize the objective function to misclassify the image.
+    # If the objective function is less than zero, the attack is successful
     def evaluate(self, perturbation):
         perturbed_image = self._get_perturbed_image(perturbation=perturbation)
         #  make the predictions 1-D
@@ -54,7 +54,7 @@ class ObjectiveFunctionEvaluator:
                 perturbed_image_predictions[self.target_class] = -float('inf')
                 best_other_class_score = np.max(perturbed_image_predictions)
 
-                return target_class_score - best_other_class_score
+                return  best_other_class_score - target_class_score
             # the case of the un-targeted attack
             else:
                 # the score of the correct class of the original target image
@@ -64,6 +64,6 @@ class ObjectiveFunctionEvaluator:
                 perturbed_image_predictions[self.correct_class] = -float('inf')
                 best_incorrect_class_score = np.max(perturbed_image_predictions)
 
-                return best_incorrect_class_score - correct_class_score
+                return  correct_class_score - best_incorrect_class_score
         else:
             raise NotImplementedError
