@@ -19,3 +19,6 @@ class MNISTDescriptor:
     dataset_folder = './datasets/'
 
     attacked_model_path = './src/attacked_models/mnist/mnist'
+
+    # the bound for the image pixels after rescaling from [0, 255] range
+    image_bounds = [0,1]

@@ -56,5 +56,4 @@ class MNISTAttackedModel:
         and then subtract 0.5 here to match the normalisation from Nicholas Carlini
 
         """
-        data -= 0.5
-        return K.eval(self.model(data.reshape(-1, 28,28,1)))
+        return K.eval(self.model((data - 0.5).reshape(-1, 28,28,1)))
