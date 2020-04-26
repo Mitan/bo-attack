@@ -1,5 +1,11 @@
 """
 A class for runner the outer BO loop on dimensions
+
+NOTE: this BO maximizes the acquisition function.
+However, to match the GPy implementation, the target function has to be minimized
+Therefore, we change the sign of the output measurements and therefore, maximize the inverted objective function.
+This has to be changed later.
+#TODO
 """
 import math
 
@@ -71,4 +77,5 @@ class DimensionBORunner:
     def update_history_data(self, dimension, iterations_run, measurement):
         self.history_dimensions_iterations = np.append(self.history_dimensions_iterations,
                                                        np.atleast_2d([dimension, iterations_run]), axis=0)
-        self.history_measurements = np.append(self.history_measurements, measurement)
+        # TODO note the inverted sign. See the header of this file fore more details
+        self.history_measurements = np.append(self.history_measurements, - measurement)
