@@ -1,7 +1,6 @@
 from attacked_models.AttackedModelFactory import AttackedModelFactory
 from dataset_data.mnist.MnistDescriptor import MNISTDescriptor
 from dataset_data.mnist.MnistLoader import MnistLoader
-import numpy as np
 
 from objective_func.ObjectiveFunctionEvaluator import ObjectiveFunctionEvaluator
 
@@ -46,9 +45,3 @@ if __name__ == '__main__':
 
     perturbation = - (test_image_0 - test_image_1)
     print(evaluator.evaluate(perturbation))
-
-
-
-
-
-
