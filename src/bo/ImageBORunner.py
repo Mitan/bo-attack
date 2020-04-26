@@ -1,6 +1,5 @@
 import numpy as np
 
-
 # main generic class for running BO
 from acq_funcs.AcquisitionOptimizer import AcqOptimizer
 from gp.GPFactory import GaussianProcessFactory
@@ -32,7 +31,7 @@ class ImageBORunner:
                                                         seed=1,
                                                         sparse=None,
                                                         normalize_Y=True,
-                                                        update_freq = dataset_descriptor.gp_update_freq,
+                                                        update_freq=dataset_descriptor.gp_update_freq,
                                                         nsubspaces=dataset_descriptor.num_subspace)
 
         # the optimizer for an Acquisition Function
@@ -40,15 +39,19 @@ class ImageBORunner:
                                           gp_model=self.gp_model,
                                           bounds=self.x_bounds,
                                           nsubspace=dataset_descriptor.num_subspace)
+        # the number of iterations run
+        self.iterations_run = 0
 
     def get_next_input(self):
         return self.acq_optimizer.get_next(X=self.history_inputs)
 
     def update_history_data(self, new_input, new_output):
-        # todo update the GP model
-
+        self.iterations_run += 1
         self.history_inputs = np.append(self.history_inputs, np.atleast_2d(new_input), axis=0)
         self.history_outputs = np.append(self.history_outputs, new_output)
+        self.gp_model.update_model(X_all=self.history_inputs,
+                                   Y_all_raw=self.history_outputs,
+                                   itr=self.iterations_run)
 
     # get the BO results found during the last iterations
     def get_results(self, num_iterations):

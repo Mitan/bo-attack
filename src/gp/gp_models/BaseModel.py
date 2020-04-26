@@ -8,7 +8,7 @@ class BaseModel:
         raise NotImplementedError('')
 
     @abstractmethod
-    def _update_model(self, X_all, Y_all, itr=0):
+    def update_model(self, X_all, Y_all, itr=0):
         """
         Updates the model with new observations.
         """

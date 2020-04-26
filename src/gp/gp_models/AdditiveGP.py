@@ -101,7 +101,7 @@ class Additive_GPModel_Learn_Decomp(BaseModel):
 
         return sub_model, model_log_likelihood
 
-    def _update_model(self, X_all, Y_all_raw, itr=0):
+    def update_model(self, X_all, Y_all_raw, itr=0):
         """
         :param X_all: observed input data
         :param Y_all_raw: observed output raw data

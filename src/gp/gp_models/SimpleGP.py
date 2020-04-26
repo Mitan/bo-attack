@@ -75,7 +75,7 @@ class GPModel(BaseModel):
             # bound the noise variance if not
             self.model.Gaussian_noise.constrain_bounded(1e-9, 1e6, warning=False)
 
-    def _update_model(self, X_all, Y_all_raw, itr=0):
+    def update_model(self, X_all, Y_all_raw, itr=0):
         """
         :param X_all: observed input data
         :param Y_all_raw: observed output raw data
