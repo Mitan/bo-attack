@@ -1,7 +1,12 @@
-from acq_funcs.AcquisitionOptimizer import AcqOptimizer
-from acq_funcs.Acquisitions import LCB_budget_additive, LCB_budget
+"""
+Generate an acquisition function for performing BO
+"""
+
+
+from acq_funcs.acquisitions.EI import EI
+from acq_funcs.acquisitions.LCB import LCB
+from acq_funcs.acquisitions.LCBAdditive import LCBAdditive
 from enums.AcquisitionEnum import AcquisitionEnum
-from enums.GPEnum import GPEnum
 
 
 class AcquisitionFunctionFactory:
@@ -9,18 +14,18 @@ class AcquisitionFunctionFactory:
         pass
 
     @staticmethod
-    def get_acq_optimizer(acq_type, gp_type, gp_model, bounds, nsubspaces):
-        # Choose the acquisition function for BO
-        if acq_type == AcquisitionEnum.LCB:
-            if gp_type == GPEnum.AdditiveGP:
-                acq_func = LCB_budget_additive(gp_model)
-            else:
-                acq_func = LCB_budget(gp_model)
+    def get_acq_function(acq_type, gp_model):
+        """
+        :param gp_model: The GP model for computing the acq. function.
+        :type acq_type: The type of acq. function.
+
+        """
+        if acq_type == AcquisitionEnum.EI:
+            acq_func = EI(gp_model=gp_model)
+        elif acq_type == AcquisitionEnum.LCB:
+            acq_func = LCB(gp_model=gp_model)
+        elif acq_type == AcquisitionEnum.LCBAdditive:
+            acq_func = LCBAdditive(gp_model)
         else:
             raise NotImplementedError
-
-        return AcqOptimizer(model=gp_model,
-                            acqu_func=acq_func,
-                            bounds=bounds,
-                            gp_type=gp_type,
-                            nsubspace=nsubspaces)
+        return acq_func
