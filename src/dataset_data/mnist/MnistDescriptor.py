@@ -34,3 +34,6 @@ class MNISTDescriptor:
     y_bounds_bos = [-1, 1]
 
     gp_type = GPEnum.AdditiveGP
+
+    # the frequency of re-learning the GP hypers
+    gp_update_freq = 5

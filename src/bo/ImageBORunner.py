@@ -3,6 +3,7 @@ import numpy as np
 
 # main generic class for running BO
 from acq_funcs.AcquisitionOptimizer import AcqOptimizer
+from gp.GPFactory import GaussianProcessFactory
 
 
 class ImageBORunner:
@@ -25,7 +26,14 @@ class ImageBORunner:
         self.x_bounds = np.vstack([[-1, 1]] * input_dimension * dataset_descriptor.nchannel)
 
         # the GP model for performing BO
-        self.gp_model = None
+        self.gp_model = GaussianProcessFactory().get_gp(gp_type=dataset_descriptor.gp_type,
+                                                        noise_var=1.0e-10,
+                                                        ARD=False,
+                                                        seed=1,
+                                                        sparse=None,
+                                                        normalize_Y=True,
+                                                        update_freq = dataset_descriptor.gp_update_freq,
+                                                        nsubspaces=dataset_descriptor.num_subspace)
 
         # the optimizer for an Acquisition Function
         self.acq_optimizer = AcqOptimizer(acq_type=dataset_descriptor.acq_type,
