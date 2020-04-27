@@ -17,7 +17,7 @@ class LCBAdditive:
         self.gp_model = gp_model
         self.beta = beta
 
-    def _compute_acq(self, x, subspace_id):
+    def compute_acq(self, x, subspace_id):
         """
         :param x: test location
         :param subspace_id: select a specific subspace of active dimensions
@@ -29,7 +29,7 @@ class LCBAdditive:
 
         return f_acqu
 
-    def _compute_acq_with_gradients(self, x, subspace_id):
+    def compute_acq_with_gradients(self, x, subspace_id):
         """
         :param x: test location
         :param subspace_id: select a specific subspace of active dimensions

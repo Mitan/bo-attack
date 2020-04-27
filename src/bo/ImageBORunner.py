@@ -1,3 +1,6 @@
+"""
+This generic BO class performs minimization of the objective function
+"""
 import numpy as np
 
 # main generic class for running BO
@@ -22,7 +25,7 @@ class ImageBORunner:
 
         # the bound for searching the new inputs
         input_dimension = self.history_inputs.shape[1]
-        self.x_bounds = np.vstack([[-1, 1]] * input_dimension * dataset_descriptor.nchannel)
+        self.x_bounds = np.vstack([[-1, 1]] * input_dimension * dataset_descriptor.channels)
 
         # the GP model for performing BO
         self.gp_model = GaussianProcessFactory().get_gp(gp_type=dataset_descriptor.gp_type,
@@ -33,6 +36,8 @@ class ImageBORunner:
                                                         normalize_Y=True,
                                                         update_freq=dataset_descriptor.gp_update_freq,
                                                         nsubspaces=dataset_descriptor.num_subspace)
+        self.gp_model.update_model(X_all=self.history_inputs,
+                                   Y_all_raw=self.history_outputs)
 
         # the optimizer for an Acquisition Function
         self.acq_optimizer = AcqOptimizer(acq_type=dataset_descriptor.acq_type,
@@ -48,7 +53,7 @@ class ImageBORunner:
     def update_history_data(self, new_input, new_output):
         self.iterations_run += 1
         self.history_inputs = np.append(self.history_inputs, np.atleast_2d(new_input), axis=0)
-        self.history_outputs = np.append(self.history_outputs, new_output)
+        self.history_outputs = np.append(self.history_outputs, np.atleast_2d(new_output), axis=0)
         self.gp_model.update_model(X_all=self.history_inputs,
                                    Y_all_raw=self.history_outputs,
                                    itr=self.iterations_run)

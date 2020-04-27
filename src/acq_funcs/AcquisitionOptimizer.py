@@ -64,11 +64,11 @@ class AcqOptimizer:
         """
 
         # Turn the acquisition function to be - acqu_func for minimisation
-        target_func = lambda x: - acqu_func._compute_acq(x)
+        target_func = lambda x: - acqu_func.compute_acq(x)
 
         # Define a new function combingin the acquisition function and its derivative
         def target_func_with_gradient(x):
-            acqu_f, dacqu_f = acqu_func._compute_acq_withGradients(x)
+            acqu_f, dacqu_f = acqu_func.compute_acq_with_gradients(x)
             return -acqu_f, -dacqu_f
 
         # Define bounds for the local optimisers
@@ -147,7 +147,7 @@ class AcqOptimizer:
                 else:
                     x_aug = np.zeros([N, d])
                     x_aug[:, active_dims_list[i]] = x
-                return - acqu_func._compute_acq(x_aug, subspace_id=i)
+                return - acqu_func.compute_acq(x_aug, subspace_id=i)
 
             # Define a new function combingin the acquisition function and its derivative
             def target_func_with_gradient(x_raw):
@@ -159,7 +159,7 @@ class AcqOptimizer:
                     x_aug = np.zeros([N, d])
                     x_aug[:, active_dims_list[i]] = x
 
-                acqu_f, dacqu_f = acqu_func._compute_acq_withGradients(x_aug, subspace_id=i)
+                acqu_f, dacqu_f = acqu_func.compute_acq_with_gradients(x_aug, subspace_id=i)
                 return -acqu_f, -dacqu_f
 
             # Find the top n_start candidates from random grid search to perform local optimisation

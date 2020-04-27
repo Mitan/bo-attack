@@ -4,6 +4,7 @@
 import GPy
 import numpy as np
 
+from enums.GPEnum import GPEnum
 from src.utilities.utilities import subset_select
 from src.gp.gp_models.BaseModel import BaseModel
 
@@ -30,6 +31,7 @@ class GPModel(BaseModel):
         :param normalize_Y: normalise output data
         :param update_freq: frequency of relearning GP hyperparameters
         """
+        self.gp_type = GPEnum.SimpleGP
 
         self.kernel = kernel
         self.noise_var = noise_var
@@ -91,7 +93,7 @@ class GPModel(BaseModel):
             Y_all = Y_all_raw
 
         # if use sparse GP option, select only a subset of observed data for training surrogate (one-type of sparse GP)
-        if self.sparse.startswith('SUB'):
+        if self.sparse is not None and self.sparse.startswith('SUB'):
             X_all, Y_all = subset_select(X_all, Y_all, select_metric=self.sparse)
 
         # initialise model or update the observed data for the model

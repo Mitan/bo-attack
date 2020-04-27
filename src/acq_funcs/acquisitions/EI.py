@@ -27,7 +27,7 @@ class EI:
         """
 
         m, s = self.gp_model.predict(x)
-        fmin = self.gp_model.get_fmin()
+        fmin = self.gp_model.model.get_fmin()
         phi, Phi, u = get_quantiles(self.jitter, fmin, m, s)
         f_acqu = s * (u * Phi + phi)
         return f_acqu

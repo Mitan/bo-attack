@@ -3,6 +3,7 @@
 import GPy
 import numpy as np
 
+from enums.GPEnum import GPEnum
 from src.utilities.utilities import subset_select, subset_select_for_learning
 from src.gp.gp_models.BaseModel import BaseModel
 
@@ -36,6 +37,8 @@ class Additive_GPModel_Learn_Decomp(BaseModel):
         :param n_subspaces: number of subspaces to be decomposed into
         :param update_freq: frequency of relearning GP hyperparameters
         """
+        self.gp_type = GPEnum.AdditiveGP
+
         self.kernel = kernel
         self.noise_var = noise_var
         self.exact_feval = exact_feval
