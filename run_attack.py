@@ -31,3 +31,6 @@ if __name__ == '__main__':
                           num_initial_observations=dataset_descriptor.initial_observations,
                           initial_history_inputs=initial_inputs,
                           initial_history_outputs=initial_outputs)
+
+    attack_runner.run(bos_iterations=dataset_descriptor.bos_iterations,
+                      total_iterations_max=dataset_descriptor.total_iterations)

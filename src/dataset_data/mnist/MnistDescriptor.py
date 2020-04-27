@@ -34,8 +34,8 @@ class MNISTDescriptor:
     gp_type = GPEnum.AdditiveGP
     acq_type = AcquisitionEnum.AdditiveLCB
 
-    gp_type = GPEnum.SimpleGP
-    acq_type = AcquisitionEnum.LCB
+    # gp_type = GPEnum.SimpleGP
+    # acq_type = AcquisitionEnum.LCB
 
     # the frequency of re-learning the GP hypers
     gp_update_freq = 5
@@ -46,8 +46,9 @@ class MNISTDescriptor:
 
     initial_observations = 30
 
-    total_observations = 900
+    total_iterations = 900
 
     vae_num_epochs = 50
 
+    bos_iterations = 40
 

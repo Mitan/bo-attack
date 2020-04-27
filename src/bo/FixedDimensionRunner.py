@@ -73,8 +73,8 @@ class FixedDimensionRunner:
         :type initial_history_outputs: array-like. The history of outputs obtained by the previous iterations of BO
             on images (with all other dimensions)
         """
-        # self.vae.train(num_epochs=self.dataset_descriptor.vae_num_epochs,
-        #                dataset_folder=self.dataset_descriptor.dataset_folder)
+        self.vae.train(num_epochs=self.dataset_descriptor.vae_num_epochs,
+                       dataset_folder=self.dataset_descriptor.dataset_folder)
 
         # reduce the dimension history of the input using VAE
         encoded_initial_history_inputs = self.vae.encode(inputs=initial_history_inputs)
@@ -103,7 +103,7 @@ class FixedDimensionRunner:
 
             # update the number of iterations run and the history data
             self.iterations_run += 1
-            self.update_history_data(new_input=new_input, new_output=new_output)
+
 
             # if we found a successful attack, return
             if new_output < 0:
@@ -123,15 +123,19 @@ class FixedDimensionRunner:
                                                   y_bounds=self.Y_BOUNDS,
                                                   grid_size=self.BOS_GRID_SIZE)
 
+            self.update_history_data(new_input=new_input, new_output=new_output)
+
             # start using the decision rules obtained from BOS (only if  we are using early stopping with BOS)
-            if early_stop and (i >= self.initial_bos_iterations - 1):
+            if early_stop and (i >= self.initial_bos_iterations):
                 # BOS implementation requires the learning curves to decrease, so invert them
                 state = np.mean(self.history_best_outputs)
                 ind_state = np.max(np.nonzero(state > grid_st)[0])
-                action_to_take = action_regions[i, ind_state]
+
+                action_to_take = action_regions[i - self.initial_bos_iterations, ind_state]
 
                 # condition 1: if action_to_take == 2, then the optimal decision is to stop the current training
                 if action_to_take == 2:
+                    print("Stopping BOS for dimension {} after {} iterations".format(self.dimension, i))
                     # condition 2: the second criteria used in the BO-BOS algorithm
                     break
 
