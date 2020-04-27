@@ -37,3 +37,11 @@ class MNISTDescriptor:
 
     # the frequency of re-learning the GP hypers
     gp_update_freq = 5
+    # set it similar to BayesOpt attack code
+    bo_dimensions = [i**2 for i in range(6, 21, 2)]
+
+    initial_dimensions = [6**2, 20**2, 14**2]
+
+    initial_obserations = 30
+
+    total_observations = 900

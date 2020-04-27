@@ -25,7 +25,7 @@ if __name__ == '__main__':
                               dataset_descriptor=dataset_descriptor)
 
     dummy_bos_iterations = 5
-    for i in range(50):
+    for i in range(100):
         next_input = bo_runner.get_next_input()
         new_measurement = np.abs(10* np.sin(np.sum(next_input))) + np.random.randn() * 0.05
         bo_runner.update_history_data(new_input=next_input,
