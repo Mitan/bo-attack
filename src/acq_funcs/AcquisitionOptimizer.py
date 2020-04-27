@@ -82,6 +82,7 @@ class AcqOptimizer:
         d = bounds.shape[0]
         Xgrid = np.tile(bounds[:, 0], (gridSize, 1)) + np.tile((bounds[:, 1] - bounds[:, 0]),
                                                                (gridSize, 1)) * np.random.rand(gridSize, d)
+
         Xgrid = np.vstack((Xgrid, X_ob))
         results = target_func(Xgrid)
 

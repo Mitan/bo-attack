@@ -17,7 +17,7 @@ class InitialDataGenerator:
     # generate the required number of images
     def generate(self, num_images, method='lhs'):
         noise_var = 1.0e-10
-        bounds = self.dataset_descriptor.bo_bounds
+        bounds = np.vstack([[-1, 1]] * self.dataset_descriptor.dim * self.dataset_descriptor.channels)
         d = bounds.shape[0]
 
         if method == 'lhs':

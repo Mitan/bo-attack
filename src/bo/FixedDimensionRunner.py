@@ -73,8 +73,8 @@ class FixedDimensionRunner:
         :type initial_history_outputs: array-like. The history of outputs obtained by the previous iterations of BO
             on images (with all other dimensions)
         """
-        self.vae.train(num_epochs=self.dataset_descriptor.vae_num_epochs,
-                       dataset_folder=self.dataset_descriptor.)
+        # self.vae.train(num_epochs=self.dataset_descriptor.vae_num_epochs,
+        #                dataset_folder=self.dataset_descriptor.dataset_folder)
 
         # reduce the dimension history of the input using VAE
         encoded_initial_history_inputs = self.vae.encode(inputs=initial_history_inputs)
@@ -155,4 +155,4 @@ class FixedDimensionRunner:
         # update the best output for dimension BO
         self.best_output = min(self.best_output, new_output)
         # update the history of best outputs for performing BOS
-        self.history_best_outputs = self.history_best_outputs.append(self.best_output)
+        self.history_best_outputs = np.append(arr=self.history_best_outputs, values=self.best_output)

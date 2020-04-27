@@ -26,14 +26,16 @@ class MNISTDescriptor:
     # the bound for the image pixels after rescaling from [0, 255] range
     image_bounds = [0,1]
 
-    acq_type = AcquisitionEnum.AdditiveLCB
-
     num_subspace = 12
 
     # the bound on summary statistic for BOS
     y_bounds_bos = [-1, 1]
 
     gp_type = GPEnum.AdditiveGP
+    acq_type = AcquisitionEnum.AdditiveLCB
+
+    gp_type = GPEnum.SimpleGP
+    acq_type = AcquisitionEnum.LCB
 
     # the frequency of re-learning the GP hypers
     gp_update_freq = 5
@@ -48,5 +50,4 @@ class MNISTDescriptor:
 
     vae_num_epochs = 50
 
-    # the bounds for searching the perturbation in BO
-    bo_bounds = np.vstack([[-1, 1]] * dim * channels)
+

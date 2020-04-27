@@ -110,4 +110,4 @@ class AttackRunner:
         # update the inputs and outputs with the new data obtained from BO-BOS
         # todo change this
         self.inputs_history = np.append(self.inputs_history, new_inputs, axis=0)
-        self.outputs_history = np.append(self.outputs_history, new_outputs)
+        self.outputs_history = np.append(self.outputs_history, new_outputs, axis=0)

@@ -44,7 +44,7 @@ class ObjectiveFunctionEvaluator:
     # We want to minimize the objective function to misclassify the image.
     # If the objective function is less than zero, the attack is successful
     def evaluate(self, perturbation):
-        perturbed_image = self._get_perturbed_image(perturbation=perturbation)
+        perturbed_image = self._get_perturbed_image(perturbation=perturbation.squeeze())
         #  make the predictions 1-D
         perturbed_image_predictions = self.attacked_model.predict(perturbed_image).squeeze()
 

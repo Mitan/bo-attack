@@ -39,10 +39,12 @@ class ImageBORunner:
 
         assert initial_history_outputs.ndim == 2, "initial_history_outputs has to be 2D array"
         self.history_outputs = initial_history_outputs
+        assert self.history_outputs.shape[0] == self.history_inputs.shape[0]
 
         # the bounds for searching the new inputs
         input_dimension = self.history_inputs.shape[1]
-        self.x_bounds = self.dataset_descriptor.bo_bounds
+        print("Init ImageBORunner with dimension {}".format(input_dimension))
+        self.x_bounds =  np.vstack([[-1, 1]] * input_dimension * self.dataset_descriptor.channels)
 
         self.gp_model = GaussianProcessFactory().get_gp(gp_type=self.dataset_descriptor.gp_type,
                                                         noise_var=1.0e-10,
