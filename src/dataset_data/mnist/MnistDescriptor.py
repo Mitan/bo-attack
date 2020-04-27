@@ -26,7 +26,7 @@ class MNISTDescriptor:
     # the bound for the image pixels after rescaling from [0, 255] range
     image_bounds = [0,1]
 
-    acq_type = AcquisitionEnum.LCB
+    acq_type = AcquisitionEnum.AdditiveLCB
 
     num_subspace = 12
 

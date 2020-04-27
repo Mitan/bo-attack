@@ -117,7 +117,7 @@ class Additive_GPModel_Learn_Decomp(BaseModel):
             Y_all = Y_all_raw
 
         # if use sparse GP option, select only a subset of observed data for training surrogate (one-type of sparse GP)
-        if self.sparse.startswith('SUB'):
+        if self.sparse is not None and self.sparse.startswith('SUB'):
             X_all, Y_all = subset_select(X_all, Y_all, select_metric=self.sparse)
 
         # initialise model or update the observed data for the model
@@ -132,7 +132,7 @@ class Additive_GPModel_Learn_Decomp(BaseModel):
             input_dim_permutate_list = [np.random.permutation(range(self.input_dim)) for i in range(self.n_decomp)]
             input_dim_permutate_list.append(self.input_dim_opt_ex)
 
-            if 'ADD' in self.sparse:
+            if self.sparse is not None and 'ADD' in self.sparse:
                 print('learn the decomposition with subset observed data')
                 X_ob, Y_ob = subset_select_for_learning(X_all, Y_all, select_metric=self.sparse)
             else:
@@ -142,7 +142,7 @@ class Additive_GPModel_Learn_Decomp(BaseModel):
             submodel_list = []
             for i, input_dim_i in enumerate(input_dim_permutate_list):
                 sub_model_i, ll_i = self._create_model_sub(X_ob, Y_ob, input_dim_i)
-                print(f'll for decom {i} ={ll_i}')
+                # print(f'll for decom {i} ={ll_i}')
                 ll_list.append(ll_i)
                 submodel_list.append(sub_model_i)
 

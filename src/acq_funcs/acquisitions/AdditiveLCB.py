@@ -4,7 +4,7 @@ This code is modified by Dmitrii based on the original code by Robin Ru
 # All acquisition functions are to be maximised
 
 
-class LCBAdditive:
+class AdditiveLCB:
 
     def __init__(self, gp_model, beta=3):
         """

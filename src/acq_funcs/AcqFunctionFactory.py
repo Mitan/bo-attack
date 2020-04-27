@@ -5,7 +5,7 @@ Generate an acquisition function for performing BO
 
 from acq_funcs.acquisitions.EI import EI
 from acq_funcs.acquisitions.LCB import LCB
-from acq_funcs.acquisitions.LCBAdditive import LCBAdditive
+from acq_funcs.acquisitions.AdditiveLCB import AdditiveLCB
 from enums.AcquisitionEnum import AcquisitionEnum
 
 
@@ -24,8 +24,8 @@ class AcquisitionFunctionFactory:
             acq_func = EI(gp_model=gp_model)
         elif acq_type == AcquisitionEnum.LCB:
             acq_func = LCB(gp_model=gp_model)
-        elif acq_type == AcquisitionEnum.LCBAdditive:
-            acq_func = LCBAdditive(gp_model)
+        elif acq_type == AcquisitionEnum.AdditiveLCB:
+            acq_func = AdditiveLCB(gp_model)
         else:
             raise NotImplementedError
         return acq_func

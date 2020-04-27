@@ -4,4 +4,4 @@ def my_enum(**enums):
 
 AcquisitionEnum = my_enum(EI=1,
                           LCB=2,
-                          LCBAdditive=3)
+                          AdditiveLCB=3)

@@ -2,6 +2,7 @@
 Modified by Dmitrii from the original code by Robin Ru
 """
 from acq_funcs.AcqFunctionFactory import AcquisitionFunctionFactory
+from enums.AcquisitionEnum import AcquisitionEnum
 from enums.GPEnum import GPEnum
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
@@ -18,6 +19,9 @@ class AcqOptimizer:
         :param bounds: input space bounds
         :param nsubspace: number of subspaces needs to be specified for ADDGP-BO but equals 1 for other BO attacks
         """
+        if gp_model.gp_type == GPEnum.AdditiveGP:
+            assert acq_type == AcquisitionEnum.AdditiveLCB, "Additive GP requires and additive acq. function"
+
         self.gp_model = gp_model
 
         self.bounds = bounds
@@ -136,7 +140,7 @@ class AcqOptimizer:
 
         # Optimise the acquisition function in each subspace separately in sequence
         for i in range(nsubspace):
-            print(f'start optimising subspace{i}')
+            # print(f'start optimising subspace{i}')
 
             # Define the acquisition function for the subspace and turn it to be - acqu_func for minimisation
             def target_func(x_raw):
