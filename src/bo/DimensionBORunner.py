@@ -84,3 +84,5 @@ class DimensionBORunner:
                                                            np.atleast_2d([dimension, iterations_run]), axis=0)
             # TODO note the inverted sign. See the header of this file fore more details
             self.history_measurements = np.append(self.history_measurements, - measurement)
+
+        assert self.history_dimensions_iterations.shape[0] == self.history_measurements.shape[0]

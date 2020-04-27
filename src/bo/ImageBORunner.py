@@ -69,6 +69,7 @@ class ImageBORunner:
         self.iterations_run += 1
         self.history_inputs = np.append(self.history_inputs, np.atleast_2d(new_input), axis=0)
         self.history_outputs = np.append(self.history_outputs, np.atleast_2d(new_output), axis=0)
+        assert self.history_inputs.shape[0] == self.history_outputs.shape[0]
         self.gp_model.update_model(X_all=self.history_inputs,
                                    Y_all_raw=self.history_outputs,
                                    itr=self.iterations_run)
