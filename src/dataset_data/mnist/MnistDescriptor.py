@@ -2,7 +2,7 @@
 from enums.AcquisitionEnum import AcquisitionEnum
 from enums.DatasetEnum import DatasetEnum
 from enums.GPEnum import GPEnum
-
+import numpy as np
 
 class MNISTDescriptor:
 
@@ -47,3 +47,6 @@ class MNISTDescriptor:
     total_observations = 900
 
     vae_num_epochs = 50
+
+    # the bounds for searching the perturbation in BO
+    bo_bounds = np.vstack([[-1, 1]] * dim * channels)

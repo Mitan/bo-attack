@@ -42,7 +42,7 @@ class ImageBORunner:
 
         # the bounds for searching the new inputs
         input_dimension = self.history_inputs.shape[1]
-        self.x_bounds = np.vstack([[-1, 1]] * input_dimension * self.dataset_descriptor.channels)
+        self.x_bounds = self.dataset_descriptor.bo_bounds
 
         self.gp_model = GaussianProcessFactory().get_gp(gp_type=self.dataset_descriptor.gp_type,
                                                         noise_var=1.0e-10,

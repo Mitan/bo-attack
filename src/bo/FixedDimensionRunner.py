@@ -65,7 +65,7 @@ class FixedDimensionRunner:
         # The current iteration of BO over dimensions. Needed to pass to BOS function
         self.dimension_bo_iteration = dimension_bo_iteration
 
-    # init 
+    # init
     def init(self, initial_history_inputs, initial_history_outputs):
         """
         :type initial_history_inputs: array-like. The history of inputs obtained by the previous iterations of BO
@@ -73,8 +73,8 @@ class FixedDimensionRunner:
         :type initial_history_outputs: array-like. The history of outputs obtained by the previous iterations of BO
             on images (with all other dimensions)
         """
-
-        self.vae.train(num_epochs=self.dataset_descriptor.vae_num_epochs)
+        self.vae.train(num_epochs=self.dataset_descriptor.vae_num_epochs,
+                       dataset_folder=self.dataset_descriptor.)
 
         # reduce the dimension history of the input using VAE
         encoded_initial_history_inputs = self.vae.encode(inputs=initial_history_inputs)

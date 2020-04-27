@@ -21,16 +21,17 @@ class DimensionBORunner:
         """
         self.domain_dimensions = domain_dimensions
         # list of selected dimensions and corresponding BO iterations run from the beginning
-        self.history_dimensions_iterations = []
+        self.history_dimensions_iterations = None
         # list of the measurements of the corresponding dimensions
-        self.history_measurements = []
+        self.history_measurements = None
         # need only to pass bo_iteration to BOS function.
         self.iterations_run = 0
 
     # initialize GP and BO with a few initial measurements
-    def init_bo(self):
-        # todo init GP here and re-learn hypers not every time, but if number of inputs is divisible by certain const
-        raise NotImplemented
+    # def init(self, initial_dimensions_iterations, initial_measurements):
+    #     # todo init GP here and re-learn hypers not every time, but if number of inputs is divisible by certain const
+    #     self.history_dimensions_iterations = initial_dimensions_iterations
+    #     self.history_measurements = initial_measurements
 
     # select the next dimension using EI
     def select_next_dimension(self, iterations_run):

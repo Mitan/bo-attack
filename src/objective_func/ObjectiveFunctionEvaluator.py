@@ -27,6 +27,10 @@ class ObjectiveFunctionEvaluator:
         assert self.correct_class != self.target_class, "the target class should be different from the correct one"
 
     def _get_perturbed_image(self, perturbation):
+
+        assert perturbation.shape == self.target_image.shape, \
+            "target and perturbation have wrong shapes {} and {}".format(self.target_image.shape, perturbation.shape)
+
         epsilon = self.dataset_descriptor.epsilon
         unscaled_perturbed_image = self.target_image + epsilon * perturbation
         if self.rescale:

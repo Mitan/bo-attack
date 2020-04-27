@@ -2,6 +2,7 @@ from bo.AttackRunner import AttackRunner
 from dataset_data.mnist.MnistDescriptor import MNISTDescriptor
 from dataset_data.mnist.MnistLoader import MnistLoader
 from objective_func.ObjectiveFunctionEvaluator import ObjectiveFunctionEvaluator
+from utilities.InitialDataGenerator import InitialDataGenerator
 
 if __name__ == '__main__':
     dataset_descriptor = MNISTDescriptor()
@@ -20,6 +21,11 @@ if __name__ == '__main__':
     attack_runner = AttackRunner(objective_function_evaluator=evaluator,
                                  dataset_descriptor=dataset_descriptor,
                                  domain_dimensions=dataset_descriptor.bo_dimensions)
+
+    initial_data_generator = InitialDataGenerator(dataset_descriptor=dataset_descriptor,
+                                                  objective_function_evaluator=evaluator)
+
+    initial_inputs, initial_outputs = initial_data_generator.generate(num_images=5, method='a')
 
     attack_runner.init_bo(initial_dimensions=dataset_descriptor.initial_dimensions,
                           num_initial_observations=dataset_descriptor.initial_observations)
