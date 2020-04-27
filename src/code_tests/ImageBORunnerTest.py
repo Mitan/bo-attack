@@ -6,7 +6,7 @@ from dataset_data.mnist.MnistDescriptor import MNISTDescriptor
 from enums.GPEnum import GPEnum
 
 if __name__ == '__main__':
-    num_points = 1000
+    num_points = 10000
     point_dim = 4
     X = np.random.uniform(-1., 1., (num_points, point_dim))
     # Y = np.sin(X)

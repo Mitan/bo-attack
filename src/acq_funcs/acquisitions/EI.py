@@ -27,10 +27,17 @@ class EI:
         """
 
         m, s = self.gp_model.predict(x)
-        fmin = self.gp_model.model.get_fmin()
+        fmin = self._get_fmin()
         phi, Phi, u = get_quantiles(self.jitter, fmin, m, s)
         f_acqu = s * (u * Phi + phi)
         return f_acqu
+
+    # this method is taken from GPyOpt
+    def _get_fmin(self):
+        """
+        Returns the location where the posterior mean is takes its minimal value.
+        """
+        return self.gp_model.model.predict(self.gp_model.model.X)[0].min()
 
     def compute_acq_with_gradients(self, x):
         """
@@ -39,7 +46,7 @@ class EI:
         :return df_acqu: derivative of acqusition function values w.r.t test location
         """
 
-        fmin = self.gp_model.get_fmin()
+        fmin = self._get_fmin()
         m, s, dmdx, dsdx = self.gp_model.predict_with_gradients(x)
         phi, Phi, u = get_quantiles(self.jitter, fmin, m, s)
         f_acqu = s * (u * Phi + phi)
