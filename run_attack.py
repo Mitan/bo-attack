@@ -28,4 +28,6 @@ if __name__ == '__main__':
     initial_inputs, initial_outputs = initial_data_generator.generate(num_images=5, method='a')
 
     attack_runner.init_bo(initial_dimensions=dataset_descriptor.initial_dimensions,
-                          num_initial_observations=dataset_descriptor.initial_observations)
+                          num_initial_observations=dataset_descriptor.initial_observations,
+                          initial_history_inputs=initial_inputs,
+                          initial_history_outputs=initial_outputs)

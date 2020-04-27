@@ -35,7 +35,11 @@ class AttackRunner:
         self.successful_attack_image = None
 
     # initialize GP and BO with a few initial measurements
-    def init_bo(self, initial_dimensions, num_initial_observations):
+    def init_bo(self, initial_dimensions, num_initial_observations, initial_history_inputs, initial_history_outputs):
+        self.inputs_history = initial_history_inputs
+
+        self.outputs_history = initial_history_outputs
+
         observations_per_dimension = int(num_initial_observations / len(initial_dimensions))
         for d in initial_dimensions:
             self._run_with_fixed_dimension(next_dimension=d,
