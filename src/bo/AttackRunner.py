@@ -4,7 +4,6 @@ A class for runner the outer BO loop on dimensions
 from bo.DimensionBORunner import DimensionBORunner
 import numpy as np
 
-
 # the paper uses 30 initial evaluations
 # 900 max iterations
 # GP update frequency of 5 iterations
@@ -39,9 +38,9 @@ class AttackRunner:
     def init_bo(self, initial_dimensions, num_initial_observations):
         observations_per_dimension = int(num_initial_observations / len(initial_dimensions))
         for d in initial_dimensions:
-            self._run_one_bo_with_fixed_dimension(next_dimension=d,
-                                                  iterations=observations_per_dimension,
-                                                  early_stop=False)
+            self._run_with_fixed_dimension(next_dimension=d,
+                                           iterations=observations_per_dimension,
+                                           early_stop=False)
 
     # select the next dimension using EI
     def select_next_dimension(self, bos_iterations):
@@ -63,9 +62,9 @@ class AttackRunner:
             # the max number of iterations the BO-BOS algorithm can run
             allowed_iterations = min(total_iterations_max - self.total_iterations, bos_iterations)
 
-            self._run_one_bo_with_fixed_dimension(next_dimension=next_dimension,
-                                                  iterations=allowed_iterations,
-                                                  early_stop=True)
+            self._run_with_fixed_dimension(next_dimension=next_dimension,
+                                           iterations=allowed_iterations,
+                                           early_stop=True)
             if self.attack_status:
                 break
 
@@ -75,14 +74,14 @@ class AttackRunner:
         else:
             print("Attack failed after {} iterations".format(self.total_iterations))
 
-    def _run_one_bo_with_fixed_dimension(self, next_dimension, iterations, early_stop):
+    def _run_with_fixed_dimension(self, next_dimension, iterations, early_stop):
         fixed_dim_runner = FixedDimensionRunner(objective_function_evaluator=self.objective_function_evaluator,
                                                 dataset_descriptor=self.dataset_descriptor,
                                                 dimension_bo_iteration=self.dimension_bo_runner.iterations_run,
                                                 dimension=next_dimension)
 
-        fixed_dim_runner.init_bo(initial_history_inputs=self.inputs_history,
-                                 initial_history_outputs=self.outputs_history)
+        fixed_dim_runner.init(initial_history_inputs=self.inputs_history,
+                              initial_history_outputs=self.outputs_history)
 
         # run BO-BOS for this dimension
         new_inputs, new_outputs = fixed_dim_runner.run(iterations=iterations,

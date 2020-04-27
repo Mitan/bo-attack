@@ -22,10 +22,6 @@ class FixedDimensionRunner:
         :type dataset_descriptor: the descriptor of the dataset
         :type dimension_bo_iteration: int. The current iteration of BO over dimensions. Needed to pass to BOS function
         :type initial_bos_iterations: int. Number of initial BO-BOS iterations to run without stopping.
-        :type initial_history_inputs: array-like. The history of inputs obtained by the previous iterations of BO
-            on images (with all other dimensions)
-         :type initial_history_outputs: array-like. The history of outputs obtained by the previous iterations of BO
-            on images (with all other dimensions)
         :type dimension: int. The dimension of the inputs to perform BO-BOS
 
         """
@@ -69,34 +65,36 @@ class FixedDimensionRunner:
         # The current iteration of BO over dimensions. Needed to pass to BOS function
         self.dimension_bo_iteration = dimension_bo_iteration
 
-    # init BO
-    def init_bo(self, initial_history_inputs, initial_history_outputs):
+    # init 
+    def init(self, initial_history_inputs, initial_history_outputs):
         """
         :type initial_history_inputs: array-like. The history of inputs obtained by the previous iterations of BO
             on images (with all other dimensions)
         :type initial_history_outputs: array-like. The history of outputs obtained by the previous iterations of BO
             on images (with all other dimensions)
         """
+
         self.vae.train(num_epochs=self.dataset_descriptor.vae_num_epochs)
-        # the class doing BO on images
+
         # reduce the dimension history of the input using VAE
         encoded_initial_history_inputs = self.vae.encode(inputs=initial_history_inputs)
 
-        self.image_bo_runner = ImageBORunner(dataset_descriptor=self.dataset_descriptor,
-                                             initial_history_inputs=encoded_initial_history_inputs,
-                                             initial_history_outputs=initial_history_outputs)
+        # the class for doing BO on images
+        self.image_bo_runner = ImageBORunner(dataset_descriptor=self.dataset_descriptor)
+
+        self.image_bo_runner.init(initial_history_inputs=encoded_initial_history_inputs,
+                                  initial_history_outputs=initial_history_outputs)
+
         self.best_output = np.min(initial_history_outputs)
         self.history_best_outputs = np.array(self.best_output)
 
     # run the BO procedure using BO-BOS
-    def run(self, iterations, early_stop=True):
+    def run(self, iterations, early_stop):
         """
         :type early_stop: bool. flag to indicate whether we want to run BOS or not
          (we don't want to run it during the initialisation)
         :type iterations: int. Max number of itertions to run BO-BOS
         """
-        # train the VAE
-        self.vae.train(num_epochs=self.dataset_descriptor.vae_num_epochs)
 
         for i in range(iterations):
             # run an iteration of BO to get a new candidate image
@@ -115,8 +113,8 @@ class FixedDimensionRunner:
                 break
 
             # if we haven't found a successful attack, check if we want to run more iterations using BOS
-            # but only if i is larger than initial number of iterations
-            if i == self.initial_bos_iterations - 1:
+            # but only if i is larger than initial number of iterations and we are using early stopping with BOS
+            if early_stop and (i == self.initial_bos_iterations - 1):
                 # BOS implementation requires the learning curves to decrease
                 action_regions, grid_st = run_BOS(init_curve=self.history_best_outputs,
                                                   incumbent=self.best_output,
@@ -125,8 +123,8 @@ class FixedDimensionRunner:
                                                   y_bounds=self.Y_BOUNDS,
                                                   grid_size=self.BOS_GRID_SIZE)
 
-            # start using the decision rules obtained from BOS
-            if i >= self.initial_bos_iterations - 1:
+            # start using the decision rules obtained from BOS (only if  we are using early stopping with BOS)
+            if early_stop and (i >= self.initial_bos_iterations - 1):
                 # BOS implementation requires the learning curves to decrease, so invert them
                 state = np.mean(self.history_best_outputs)
                 ind_state = np.max(np.nonzero(state > grid_st)[0])
