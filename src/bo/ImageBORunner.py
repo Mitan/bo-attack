@@ -47,6 +47,9 @@ class ImageBORunner:
         # the number of iterations run
         self.iterations_run = 0
 
+    def init(self):
+        pass
+
     def get_next_input(self):
         return self.acq_optimizer.get_next(X=self.history_inputs)
 

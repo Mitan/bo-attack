@@ -13,10 +13,13 @@ if __name__ == '__main__':
                                            use_softmax=True,
                                            rescale=False,
                                            target_image=test_image_0,
-                                           target_class=None)
+                                           target_class=0)
+    # print(evaluator.attacked_model.predict(test_image_0))
+    # print(evaluator.evaluate(0))
 
-    attack_runner = AttackRunner(objective_function_evaluator=None,
+    attack_runner = AttackRunner(objective_function_evaluator=evaluator,
                                  dataset_descriptor=dataset_descriptor,
                                  domain_dimensions=dataset_descriptor.bo_dimensions)
 
-    attack_runner.init_bo()
+    attack_runner.init_bo(initial_dimensions=dataset_descriptor.initial_dimensions,
+                          num_initial_observations=dataset_descriptor.initial_observations)

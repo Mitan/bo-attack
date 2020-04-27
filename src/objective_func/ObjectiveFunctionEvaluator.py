@@ -24,6 +24,7 @@ class ObjectiveFunctionEvaluator:
                                                                         use_softmax=self.use_softmax)
         # the correct class of the original target image we are trying to mis-classify
         self.correct_class = np.argmax(self.attacked_model.predict(self.target_image))
+        assert self.correct_class != self.target_class, "the target class should be different from the correct one"
 
     def _get_perturbed_image(self, perturbation):
         epsilon = self.dataset_descriptor.epsilon

@@ -42,6 +42,8 @@ class MNISTDescriptor:
 
     initial_dimensions = [6**2, 20**2, 14**2]
 
-    initial_obserations = 30
+    initial_observations = 30
 
     total_observations = 900
+
+    vae_num_epochs = 50

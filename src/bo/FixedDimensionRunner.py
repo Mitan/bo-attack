@@ -14,8 +14,6 @@ class FixedDimensionRunner:
                  objective_function_evaluator,
                  dataset_descriptor,
                  dimension,
-                 initial_history_inputs,
-                 initial_history_outputs,
                  dimension_bo_iteration,
                  initial_bos_iterations=8):
         """
@@ -40,8 +38,6 @@ class FixedDimensionRunner:
 
         self.vae = VAEFactory.get_vae(dataset_descriptor=self.dataset_descriptor,
                                       latent_dimension=self.dimension)
-        # train the VAE
-        self.vae.train()
 
         # the current status of the attack
         self.attack_status = False
@@ -49,19 +45,14 @@ class FixedDimensionRunner:
         # the image found for the successful attack
         self.successful_attack_image = None
 
-        # reduce the dimension history of the input using VAE
-        encoded_initial_history_inputs = self.vae.encode(inputs=initial_history_inputs)
-
         # the class doing BO on images
-        self.image_bo_runner = ImageBORunner(dataset_descriptor=dataset_descriptor,
-                                             initial_history_inputs=encoded_initial_history_inputs,
-                                             initial_history_outputs=initial_history_outputs)
+        self.image_bo_runner = None
 
         # the min found measurement found by the BO procedure. Needed for the BO on dimensions
-        self.best_output = np.min(initial_history_outputs)
+        self.best_output = None
 
         # the history of best outputs found so far needed to take the decision by BO-BOS
-        self.history_best_outputs = np.array(self.best_output)
+        self.history_best_outputs = None
 
         # the numbers od iterations run by BO
         self.iterations_run = 0
@@ -78,11 +69,35 @@ class FixedDimensionRunner:
         # The current iteration of BO over dimensions. Needed to pass to BOS function
         self.dimension_bo_iteration = dimension_bo_iteration
 
-    # run the BO procedure using BO-BOS
-    def run(self, iterations):
+    # init BO
+    def init_bo(self, initial_history_inputs, initial_history_outputs):
         """
+        :type initial_history_inputs: array-like. The history of inputs obtained by the previous iterations of BO
+            on images (with all other dimensions)
+        :type initial_history_outputs: array-like. The history of outputs obtained by the previous iterations of BO
+            on images (with all other dimensions)
+        """
+        self.vae.train(num_epochs=self.dataset_descriptor.vae_num_epochs)
+        # the class doing BO on images
+        # reduce the dimension history of the input using VAE
+        encoded_initial_history_inputs = self.vae.encode(inputs=initial_history_inputs)
+
+        self.image_bo_runner = ImageBORunner(dataset_descriptor=self.dataset_descriptor,
+                                             initial_history_inputs=encoded_initial_history_inputs,
+                                             initial_history_outputs=initial_history_outputs)
+        self.best_output = np.min(initial_history_outputs)
+        self.history_best_outputs = np.array(self.best_output)
+
+    # run the BO procedure using BO-BOS
+    def run(self, iterations, early_stop=True):
+        """
+        :type early_stop: bool. flag to indicate whether we want to run BOS or not
+         (we don't want to run it during the initialisation)
         :type iterations: int. Max number of itertions to run BO-BOS
         """
+        # train the VAE
+        self.vae.train(num_epochs=self.dataset_descriptor.vae_num_epochs)
+
         for i in range(iterations):
             # run an iteration of BO to get a new candidate image
             new_input = self.image_bo_runner.get_next_input()
