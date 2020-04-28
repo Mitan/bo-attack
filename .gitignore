@@ -172,3 +172,4 @@ datasets
 src/attacked_models/mnist/mnist
 
 src/objective_func/tf_models/models/
+src/vae_models/vae_weights

@@ -40,6 +40,9 @@ class MnistVariationalAutoEncoderPytorch:
         # note: hardcoded
         self.INTERMEDIATE_DIM = 100
 
+        # the number of epochs trained
+        self.epochs_trained = 0
+
         # note: hardcoded
         self.batch_size = 100
         # note: hardcoded
@@ -111,6 +114,8 @@ class MnistVariationalAutoEncoderPytorch:
                           format(train_losses[-1], i + 1, total, ep), end='', flush=True)
                 gd.step()
 
+        self.epochs_trained = num_epochs
+
     # encode input or a batch of inputs
     # expects a 2D numpy array of shape (n_points * original_dim)
     def encode(self, inputs):
@@ -127,3 +132,21 @@ class MnistVariationalAutoEncoderPytorch:
             transformed_input = torch.tensor(inputs).float().view(-1, self.latent_dim)
             x_decoded = torch.sigmoid(self.decoder(transformed_input)).numpy()
         return x_decoded
+
+    def save_weights(self, save_folder):
+        encoder_file = "{}encoder_dim{}_{}epochs".format(save_folder, self.latent_dim, self.epochs_trained)
+        decoder_file = "{}decoder_dim{}_{}epochs".format(save_folder, self.latent_dim, self.epochs_trained)
+        torch.save(self.encoder.state_dict(), encoder_file)
+        torch.save(self.decoder.state_dict(), decoder_file)
+
+    def load_weights(self, load_folder, num_epochs_trained):
+        # reset number of epochs according to weights loaded
+        self.epochs_trained = num_epochs_trained
+
+        encoder_file = "{}encoder_dim{}_{}epochs".format(load_folder, self.latent_dim, self.epochs_trained)
+        decoder_file = "{}decoder_dim{}_{}epochs".format(load_folder, self.latent_dim, self.epochs_trained)
+        self.encoder.load_state_dict(torch.load(encoder_file))
+        self.encoder.eval()
+
+        self.decoder.load_state_dict(torch.load(decoder_file))
+        self.decoder.eval()

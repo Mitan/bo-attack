@@ -48,7 +48,7 @@ class MNISTDescriptor:
 
     total_iterations = 900
 
-    vae_num_epochs = 50
+    vae_num_epochs = 100
 
     bos_iterations = 40
 
