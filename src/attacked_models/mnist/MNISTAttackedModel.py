@@ -14,7 +14,7 @@ from keras.models import Sequential
 
 class MNISTAttackedModel:
     # note we are using softmax to get bounds [-1, 1] bounds for the BO objective function
-    def __init__(self,  use_softmax, weight_load_path=None):
+    def __init__(self, use_softmax, weight_load_path=None):
         self.num_channels = 1
         self.image_size = 28
         self.num_labels = 10
@@ -57,4 +57,6 @@ class MNISTAttackedModel:
         and then subtract 0.5 here to match the normalisation from Nicholas Carlini
 
         """
-        return K.eval(self.model((data - 0.5).reshape(-1, 28,28,1)))
+        input_data = K.constant((data - 0.5).reshape(-1, 28, 28, 1))
+        prediction = self.model(input_data)
+        return K.eval(prediction)
