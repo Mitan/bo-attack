@@ -1,5 +1,6 @@
 from src.dataset_data.mnist.MnistDescriptor import MNISTDescriptor
-from vae_models.MNISTVariationalAutoeEncoderPytorch import MnistVariationalAutoEncoderPytorch
+from src.utilities.FileUtils import check_create_folder
+from src.vae_models.MNISTVariationalAutoeEncoderPytorch import MnistVariationalAutoEncoderPytorch
 
 
 def train_one_vae(weights_root_folder, dataset_descriptor, latent_dim):
@@ -14,6 +15,7 @@ if __name__ == '__main__':
     mnist_descriptor = MNISTDescriptor()
     # mnist_descriptor.vae_num_epochs = 1
     weights_folder = './src/vae_models/vae_weights/'
+    check_create_folder(weights_folder)
 
     for dim in mnist_descriptor.bo_dimensions:
         train_one_vae(weights_root_folder=weights_folder,
