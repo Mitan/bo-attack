@@ -1,9 +1,9 @@
 """
 Modified by Dmitrii from the original code by Robin Ru
 """
-from acq_funcs.AcqFunctionFactory import AcquisitionFunctionFactory
-from enums.AcquisitionEnum import AcquisitionEnum
-from enums.GPEnum import GPEnum
+from src.acq_funcs.AcqFunctionFactory import AcquisitionFunctionFactory
+from src.enums.AcquisitionEnum import AcquisitionEnum
+from src.enums.GPEnum import GPEnum
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
 

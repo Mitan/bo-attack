@@ -3,8 +3,8 @@ This generic BO class performs minimization of the objective function
 """
 import numpy as np
 
-from acq_funcs.AcquisitionOptimizer import AcqOptimizer
-from gp.GPFactory import GaussianProcessFactory
+from src.acq_funcs.AcquisitionOptimizer import AcqOptimizer
+from src.gp.GPFactory import GaussianProcessFactory
 
 
 class ImageBORunner:
@@ -26,6 +26,7 @@ class ImageBORunner:
 
         # the optimizer for an Acquisition Function
         self.acq_optimizer = None
+
         # the number of iterations run
         self.iterations_run = 0
 
@@ -41,10 +42,10 @@ class ImageBORunner:
         self.history_outputs = initial_history_outputs
         assert self.history_outputs.shape[0] == self.history_inputs.shape[0]
 
-        # the bounds for searching the new inputs
         input_dimension = self.history_inputs.shape[1]
         print("Init ImageBORunner with dimension {}".format(input_dimension))
-        self.x_bounds =  np.vstack([[-1, 1]] * input_dimension * self.dataset_descriptor.channels)
+        # the bounds for searching the new inputs
+        self.x_bounds = np.vstack([[-1, 1]] * input_dimension * self.dataset_descriptor.channels)
 
         self.gp_model = GaussianProcessFactory().get_gp(gp_type=self.dataset_descriptor.gp_type,
                                                         noise_var=1.0e-10,

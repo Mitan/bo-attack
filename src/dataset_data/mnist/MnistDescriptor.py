@@ -1,7 +1,7 @@
 # class for storing the parameters of the MNIST dataset
-from enums.AcquisitionEnum import AcquisitionEnum
-from enums.DatasetEnum import DatasetEnum
-from enums.GPEnum import GPEnum
+from src.enums.AcquisitionEnum import AcquisitionEnum
+from src.enums.DatasetEnum import DatasetEnum
+from src.enums.GPEnum import GPEnum
 import numpy as np
 
 class MNISTDescriptor:

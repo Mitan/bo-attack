@@ -1,5 +1,5 @@
-from enums.DatasetEnum import DatasetEnum
-from vae_models.MNISTVariationalAutoeEncoderPytorch import MnistVariationalAutoEncoderPytorch
+from src.enums.DatasetEnum import DatasetEnum
+from src.vae_models.MNISTVariationalAutoeEncoderPytorch import MnistVariationalAutoEncoderPytorch
 
 
 class VAEFactory:

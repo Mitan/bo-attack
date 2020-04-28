@@ -11,7 +11,7 @@ import math
 
 import GPy
 import numpy as np
-from utilities.Utils import ei_acquizition_function
+from src.utilities.Utils import ei_acquizition_function
 
 
 class DimensionBORunner:

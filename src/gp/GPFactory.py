@@ -1,7 +1,7 @@
-from enums.GPEnum import GPEnum
+from src.enums.GPEnum import GPEnum
 
-from gp.gp_models.AdditiveGP import Additive_GPModel_Learn_Decomp
-from gp.gp_models.SimpleGP import GPModel
+from src.gp.gp_models.AdditiveGP import Additive_GPModel_Learn_Decomp
+from src.gp.gp_models.SimpleGP import GPModel
 
 
 class GaussianProcessFactory:

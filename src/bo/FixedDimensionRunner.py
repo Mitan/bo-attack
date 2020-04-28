@@ -4,9 +4,9 @@ A class for running BO-BOS with fixed dimension
 
 import numpy as np
 
-from bo.ImageBORunner import ImageBORunner
-from bo.BOSFunction import run_BOS
-from vae_models.VAEFactory import VAEFactory
+from src.bo.ImageBORunner import ImageBORunner
+from src.bo.BOSFunction import run_BOS
+from src.vae_models.VAEFactory import VAEFactory
 
 
 class FixedDimensionRunner:

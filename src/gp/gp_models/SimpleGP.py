@@ -4,7 +4,7 @@
 import GPy
 import numpy as np
 
-from enums.GPEnum import GPEnum
+from src.enums.GPEnum import GPEnum
 from src.utilities.Utils import subset_select
 from src.gp.gp_models.BaseModel import BaseModel
 

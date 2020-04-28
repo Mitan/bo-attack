@@ -1,14 +1,14 @@
 """
 A class for runner the outer BO loop on dimensions
 """
-from bo.DimensionBORunner import DimensionBORunner
+from src.bo.DimensionBORunner import DimensionBORunner
 import numpy as np
 
 # the paper uses 30 initial evaluations
 # 900 max iterations
 # GP update frequency of 5 iterations
 # learning the dimension with frequency 8 * update_for_hypers, i.e. 8 * 5
-from bo.FixedDimensionRunner import FixedDimensionRunner
+from src.bo.FixedDimensionRunner import FixedDimensionRunner
 
 
 class AttackRunner:

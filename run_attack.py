@@ -1,8 +1,8 @@
-from bo.AttackRunner import AttackRunner
-from dataset_data.mnist.MnistDescriptor import MNISTDescriptor
-from dataset_data.mnist.MnistLoader import MnistLoader
-from objective_func.ObjectiveFunctionEvaluator import ObjectiveFunctionEvaluator
-from utilities.InitialDataGenerator import InitialDataGenerator
+from src.bo.AttackRunner import AttackRunner
+from src.dataset_data.mnist.MnistDescriptor import MNISTDescriptor
+from src.dataset_data.mnist.MnistLoader import MnistLoader
+from src.objective_func.ObjectiveFunctionEvaluator import ObjectiveFunctionEvaluator
+from src.utilities.InitialDataGenerator import InitialDataGenerator
 
 if __name__ == '__main__':
     dataset_descriptor = MNISTDescriptor()

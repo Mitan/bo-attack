@@ -1,7 +1,7 @@
 """
 A class for evaluating the objective function of the attack
 """
-from attacked_models.AttackedModelFactory import AttackedModelFactory
+from src.attacked_models.AttackedModelFactory import AttackedModelFactory
 import numpy as np
 
 

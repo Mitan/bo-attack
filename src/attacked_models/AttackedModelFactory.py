@@ -1,5 +1,5 @@
-from attacked_models.mnist.MNISTAttackedModel import MNISTAttackedModel
-from enums.DatasetEnum import DatasetEnum
+from src.attacked_models.mnist.MNISTAttackedModel import MNISTAttackedModel
+from src.enums.DatasetEnum import DatasetEnum
 
 
 class AttackedModelFactory:

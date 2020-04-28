@@ -3,10 +3,10 @@ Generate an acquisition function for performing BO
 """
 
 
-from acq_funcs.acquisitions.EI import EI
-from acq_funcs.acquisitions.LCB import LCB
-from acq_funcs.acquisitions.AdditiveLCB import AdditiveLCB
-from enums.AcquisitionEnum import AcquisitionEnum
+# from src.acq_funcs.acquisitions.EI import EI
+from src.acq_funcs.acquisitions.LCB import LCB
+from src.acq_funcs.acquisitions.AdditiveLCB import AdditiveLCB
+from src.enums.AcquisitionEnum import AcquisitionEnum
 
 
 class AcquisitionFunctionFactory:
@@ -21,11 +21,13 @@ class AcquisitionFunctionFactory:
 
         """
         if acq_type == AcquisitionEnum.EI:
-            acq_func = EI(gp_model=gp_model)
+            # acq_func = EI(gp_model=gp_model)
+            raise NotImplementedError
+
         elif acq_type == AcquisitionEnum.LCB:
             acq_func = LCB(gp_model=gp_model)
         elif acq_type == AcquisitionEnum.AdditiveLCB:
-            acq_func = AdditiveLCB(gp_model)
+            acq_func = AdditiveLCB(gp_model=gp_model)
         else:
             raise NotImplementedError
         return acq_func
