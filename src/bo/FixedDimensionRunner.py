@@ -73,8 +73,11 @@ class FixedDimensionRunner:
         :type initial_history_outputs: array-like. The history of outputs obtained by the previous iterations of BO
             on images (with all other dimensions)
         """
-        self.vae.train(num_epochs=self.dataset_descriptor.vae_num_epochs,
-                       dataset_folder=self.dataset_descriptor.dataset_folder)
+        # self.vae.train(num_epochs=self.dataset_descriptor.vae_num_epochs,
+        #                dataset_folder=self.dataset_descriptor.dataset_folder)
+        # all VAE are pre-trained and their weights are loaded instead of training
+        self.vae.load_weights(load_folder=self.dataset_descriptor.vae_weights_folder,
+                              num_epochs_trained=self.dataset_descriptor.vae_num_epochs)
 
         # reduce the dimension history of the input using VAE
         encoded_initial_history_inputs = self.vae.encode(inputs=initial_history_inputs)

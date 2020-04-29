@@ -2,7 +2,7 @@
 from src.enums.AcquisitionEnum import AcquisitionEnum
 from src.enums.DatasetEnum import DatasetEnum
 from src.enums.GPEnum import GPEnum
-import numpy as np
+
 
 class MNISTDescriptor:
 
@@ -51,4 +51,6 @@ class MNISTDescriptor:
     vae_num_epochs = 100
 
     bos_iterations = 40
+
+    vae_weights_folder = './src/vae_models/vae_weights/'
 
