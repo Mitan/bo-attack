@@ -145,8 +145,8 @@ class MnistVariationalAutoEncoderPytorch:
 
         encoder_file = "{}encoder_dim{}_{}epochs".format(load_folder, self.latent_dim, self.epochs_trained)
         decoder_file = "{}decoder_dim{}_{}epochs".format(load_folder, self.latent_dim, self.epochs_trained)
-        self.encoder.load_state_dict(torch.load(encoder_file))
+        self.encoder.load_state_dict(torch.load(encoder_file, map_location=self.device))
         self.encoder.eval()
 
-        self.decoder.load_state_dict(torch.load(decoder_file))
+        self.decoder.load_state_dict(torch.load(decoder_file, map_location=self.device))
         self.decoder.eval()
