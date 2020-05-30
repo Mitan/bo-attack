@@ -154,7 +154,9 @@ class FixedDimensionRunner:
     # evaluate the currently found input perturbation
     def get_bo_measurement(self, new_input):
         decoded_new_input = self.vae.decode(new_input)
-        return self.objective_function_evaluator.evaluate(decoded_new_input)
+        new_measurement = self.objective_function_evaluator.evaluate(decoded_new_input)
+        print('new BO measurement after {} iterations rub is {}'.format(self.iterations_run, new_measurement))
+        return new_measurement
 
     def update_history_data(self, new_input, new_output):
         # update the image BO runner with the new encoded image and the output
