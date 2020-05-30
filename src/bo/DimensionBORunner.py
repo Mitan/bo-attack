@@ -78,7 +78,7 @@ class DimensionBORunner:
     def update_history_data(self, dimension, iterations_run, measurement):
         if self.history_dimensions_iterations is None:
             self.history_dimensions_iterations = np.atleast_2d([dimension, iterations_run])
-            self.history_measurements = np.array(- measurement)
+            self.history_measurements = np.array([-measurement])
         else:
             self.history_dimensions_iterations = np.append(self.history_dimensions_iterations,
                                                            np.atleast_2d([dimension, iterations_run]), axis=0)
