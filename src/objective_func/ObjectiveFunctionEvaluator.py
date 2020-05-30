@@ -56,6 +56,9 @@ class ObjectiveFunctionEvaluator:
         #  make the predictions 1-D
         perturbed_image_predictions = self.attacked_model.predict(perturbed_image).squeeze()
 
+        # get logs of predictions to match the previous works
+        perturbed_image_predictions = np.log(perturbed_image_predictions + 1e-30)
+
         # first implement the case with probabilities as outputs
         if self.use_softmax:
             # the case of the targeted attack
