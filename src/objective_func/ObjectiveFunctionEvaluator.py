@@ -12,7 +12,7 @@ class ObjectiveFunctionEvaluator:
         :type rescale: bool. Rescale the image using epsilon value of just clip it to min/max values.
         :type use_softmax: bool. A flag whether to use sofmax for the output of the attacked model
         :type target_class: int. A target class for the attack.
-        :type target_image: the target image for the attack.
+        :type target_image: the target image for the attack. Pixels normalised to be in [0,1] range
         :type dataset_descriptor: the descriptor of the attack dataset.
         """
         self.rescale = rescale
@@ -26,24 +26,32 @@ class ObjectiveFunctionEvaluator:
         self.correct_class = np.argmax(self.attacked_model.predict(self.target_image))
         assert self.correct_class != self.target_class, "the target class should be different from the correct one"
 
+    # perturbation is the image from the VAE, its pixels are normlised to be in [0,1] range
     def _get_perturbed_image(self, perturbation):
 
         assert perturbation.shape == self.target_image.shape, \
             "target and perturbation have wrong shapes {} and {}".format(self.target_image.shape, perturbation.shape)
 
         epsilon = self.dataset_descriptor.epsilon
-        unscaled_perturbed_image = self.target_image + epsilon * perturbation
+
+        # rescale both images to the range [-0.5, 0.5]
+        shifted_target_image = self.target_image - 0.5
+        sifted_perturbation = perturbation - 0.5
+
+        # unscaled_perturbed_image is in the range [-0.5 - eps/2, 0.5 + eps/2]
+        unscaled_perturbed_image = shifted_target_image + epsilon * sifted_perturbation
         if self.rescale:
-            perturbed_image = unscaled_perturbed_image  / (1 + 2 * epsilon)
+            perturbed_image = unscaled_perturbed_image  / (1 + epsilon)
         else:
-            image_bounds = self.dataset_descriptor.image_bounds
-            perturbed_image = unscaled_perturbed_image.clip(image_bounds[0], image_bounds[1])
+            perturbed_image = unscaled_perturbed_image.clip(-0.5, 0.5)
 
         return perturbed_image
 
     # We want to minimize the objective function to misclassify the image.
     # If the objective function is less than zero, the attack is successful
+    # perturbation is the image from the VAE, its pixels are normlised to be in [0,1] range
     def evaluate(self, perturbation):
+        # perturbed_image is in the interval [-0.5, 0.5]
         perturbed_image = self._get_perturbed_image(perturbation=perturbation.squeeze())
         #  make the predictions 1-D
         perturbed_image_predictions = self.attacked_model.predict(perturbed_image).squeeze()
