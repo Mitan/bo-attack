@@ -22,10 +22,6 @@ class MNISTDescriptor:
 
     attacked_model_path = './src/attacked_models/mnist/mnist'
 
-    # todo move to a separate BO descriptor class
-    # the bound for the image pixels after rescaling from [0, 255] range
-    image_bounds = [0,1]
-
     num_subspace = 12
 
     # the bound on summary statistic for BOS
