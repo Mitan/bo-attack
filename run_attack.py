@@ -12,7 +12,7 @@ if __name__ == '__main__':
     test_image_0 = mnist_loader.test_data[0, :]
     evaluator = ObjectiveFunctionEvaluator(dataset_descriptor=dataset_descriptor,
                                            use_softmax=True,
-                                           rescale=False,
+                                           rescale=True,
                                            target_image=test_image_0,
                                            target_class=0)
     # print(evaluator.attacked_model.predict(test_image_0))
