@@ -58,9 +58,9 @@ def run_BOS(init_curve, incumbent, training_epochs, bo_iteration, y_bounds, grid
     print("samples_data: ", samples_data.shape)
 
     # remove those sampled curves that exceed the range [0, 1]
-    ind = np.all(samples_data < 1, axis=1)
+    ind = np.all(samples_data < y_bounds[1], axis=1)
     samples_data = samples_data[ind]
-    ind = np.all(samples_data > 0, axis=1)
+    ind = np.all(samples_data > y_bounds[0], axis=1)
     samples_data = samples_data[ind]
 
     # classifier accuracies are in [0,1] range

@@ -68,7 +68,7 @@ class AttackRunner:
 
             self._run_with_fixed_dimension(next_dimension=next_dimension,
                                            iterations=allowed_iterations,
-                                           early_stop=True)
+                                           early_stop=False)
             if self.attack_status:
                 break
 

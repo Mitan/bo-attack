@@ -25,7 +25,7 @@ class MNISTDescriptor:
     num_subspace = 12
 
     # the bound on summary statistic for BOS
-    y_bounds_bos = [-1, 1]
+    y_bounds_bos = [0, 30]
 
     gp_type = GPEnum.AdditiveGP
     acq_type = AcquisitionEnum.AdditiveLCB

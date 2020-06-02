@@ -9,7 +9,7 @@ if __name__ == '__main__':
 
     mnist_loader = MnistLoader()
     mnist_loader.load_data(dataset_folder=dataset_descriptor.dataset_folder)
-    test_image_0 = mnist_loader.test_data[0, :]
+    test_image_0 = mnist_loader.test_data[1, :]
     evaluator = ObjectiveFunctionEvaluator(dataset_descriptor=dataset_descriptor,
                                            use_softmax=True,
                                            rescale=True,
